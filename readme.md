@@ -5,7 +5,7 @@ The live COVID-19 data scraper getting data from government and other sources
 
 [Live Example](http://coronauk.isjeff.com/ "Live Example")
 
-##Getting Started
+## Getting Started
 
 This sourcecode require very basic nodejs skill, if you dont, you can just used the example API.
 
@@ -16,22 +16,22 @@ This sourcecode require very basic nodejs skill, if you dont, you can just used 
 	`node index.js`
 4. open `http://localhost:8003`
 
-##Importance
+## Importance
 1. Due to the announcement structure from the source may constantly changing, all data will be updated to current_shadow table waiting for admin approve. Admin can use link: http://HOST/approve?token= with token in the first row of your user table, to update to official current table.
 
 2. The wrong virus related data may cause chaos into the society, and the source data structure is not stable, false data might produced in the automatic process, so you do not want to update without admin approval.
 
 3. As I am not a professional coder, I am welcome if anyone can help me improve this project.
 
-##Powered By
+## Powered By
 Standard NodeJs + ExpressJs along with superagent, cheerio, node-schedule. Detail is in: package.json.
 
-##Current Data Source
-###Figure
+## Current Data Source
+### Figure
 UK GOV: https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public
 Worldometers: https://www.worldometers.info/coronavirus/
 
-###Area Data
+### Area Data
 England: https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public
 Scotland: https://www.gov.scot/coronavirus-covid-19/
 
