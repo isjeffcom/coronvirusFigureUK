@@ -4,10 +4,10 @@ const { stripSlashes } = require('slashes')
 
 const db = new DbClient({
     host     : 'localhost',
-    user     : 'covid19',
-    password : 'wuhanjiayou',
+    user     : '<USERNAME>',
+    password : '<PASSWORD>',
     database : 'corona',
-    port: "8889"
+    port: "<PORT>"
 })
 
 

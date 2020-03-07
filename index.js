@@ -42,8 +42,8 @@ app.get('/approve', async function (req, res) {
 
   } else {
     database.updateApprove()
-    res.send(JSON.stringify({status: true, data: null}))
     updateData()
+    res.send(JSON.stringify({status: true, data: null}))
     return
   }
 })
