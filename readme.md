@@ -2,9 +2,10 @@
 ![](https://i.ibb.co/Jj2H6wT/logoc.png)
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-[API Example Figure](http://coronauk.isjeff.com/ "API Example Figure")
-[API Example History](http://coronauk.isjeff.com/history "API Example History")
-[Data Example](http://coronauk.isjeff.com/visual "Data Example")
+[API Figure](http://coronauk.isjeff.com/ "API Figure") <br>
+[API History](http://coronauk.isjeff.com/history "API History") <br>
+[API Geolocation](http://coronauk.isjeff.com/locations "API Geolocation") <br>
+[Data Example](http://coronauk.isjeff.com/visual "Data Example") <br>
 
 ## Getting Started
 
