@@ -1,6 +1,8 @@
 const robot = require('./robot.js')
 const database = require('./database')
-const schedule = require('node-schedule-tz');
+const schedule = require('node-schedule-tz')
+const fs = require('fs')
+var path = require('path')
 
 const express = require('express')
 const app = express()
@@ -13,10 +15,17 @@ let server = app.listen(8003, function () {
 })
 
 app.get('/', async function (req, res) {
-    let data = await database.current()
-    data.areaDataSource = robot.getADS()
-    res.send(data)
-    return
+    //let data = await database.current()
+    //data.areaDataSource = robot.getADS()
+    let data = fs.readFile(path.join(__dirname, 'data/data.json'), 'utf-8', (err, data)=>{
+      if(err){
+        res.send('an error occur')
+      } else {
+        res.send(data)
+      }
+      return
+    })
+    
 })
 
 // Approve shadow data become official data
@@ -34,14 +43,25 @@ app.get('/approve', async function (req, res) {
   } else {
     database.updateApprove()
     res.send(JSON.stringify({status: true, data: null}))
+    updateData()
     return
   }
 })
 
-robot.getData()
+async function updateData(){
+  if(await robot.getData()){
+    let data = await database.current()
+    fs.writeFile(path.join(__dirname, 'data/data.json'), JSON.stringify(data), ()=>{
+      return true
+    })
+  }
+}
+
+updateData()
+
 
 var updateAll = schedule.scheduleJob('updateall', '01 * * * *', 'Europe/London', function(){
-  robot.getData()
+  updateData()
   return
 })
 

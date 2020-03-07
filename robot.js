@@ -28,8 +28,8 @@ var figure = [
 var areaData = [
     {
         name: "england",
-        link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public",
-        id: "cases-identified-in-england"
+        link: "https://www.gov.uk/government/publications/coronavirus-covid-19-number-of-cases-in-england/coronavirus-covid-19-number-of-cases-in-england",
+        id: "table-of-confirmed-cases-of-covid-19-in-england"
     },
     {
         name: "scotland",
@@ -48,19 +48,26 @@ function getADS(){
 }
 
 function getData(){
-    getDataFromNHS(figure[0])
-    getDataFromWDM(figure[1])
-    //getEnglandFromNHS(areaData[0])
-    //getScotlandFromNHS(areaData[1])
-    setTimeout(()=>{
-        getAreaData()
-    }, 2000)
+    return new Promise(resolve => {
+        getDataFromNHS(figure[0])
+        getDataFromWDM(figure[1])
+        //getEnglandFromNHS(areaData[0])
+        //getScotlandFromNHS(areaData[1])
+
+        setTimeout(()=>{
+            getAreaData()
+        }, 2000)
+
+        resolve(true)
+    })
     
 }
 
 async function getAreaData(){
     const england = await getEnglandFromNHS(areaData[0])
     const scotland = await getScotlandFromNHS(areaData[1])
+
+    
     
     const res = england.concat(scotland)
     var ready = {
@@ -135,10 +142,11 @@ function getEnglandFromNHS(data){
                 let $ = cheerio.load(res.text)
 
                 // Get table
-                let locate = $('#' + data.id).next()
+                let locate = $('#' + data.id).next().next()
                 
                 // Get all tr in tbody
                 let trs = $(locate).find('tr')
+
 
                 // Loop all tr in tbody
                 trs.each(function (idx, value){
@@ -146,17 +154,28 @@ function getEnglandFromNHS(data){
                     $value = $(value).find('td')
                     let tmpSingle = {}
                     $value.each(function (idxx, single) {
-                        
+                        //console.log($(single).text())
                         if(idxx == 0) tmpSingle.location = $(single).text()
-                        if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
+                        
+                        if(idxx == 1){
+                            let tsd = $(single).text()
+                            if(tsd.indexOf("to") != -1){
+                                tsd = tsd.split(" ")
+                                tmpSingle.number = parseInt(tsd[0].replace(/,/g, ""))
+                            } else {
+                                tmpSingle.number = parseInt(tsd.replace(/,/g, ""))
+                            }
 
+                            
+                            
+                        } 
                     })
 
                     // Has data
                     if(tmpSingle['location']){
                         // Not total or wait to be determined
                         // No idea why government put a unconfirm data into a confirm data sort by location chart...
-                        if(tmpSingle.location != "Total" && tmpSingle.location != "To be determined"){
+                        if(tmpSingle.location.indexOf("awaiting clarification") == -1){
                             result.push(tmpSingle)
                         }
                     }
@@ -188,21 +207,14 @@ function getScotlandFromNHS(data){
             }else{
                 
                 let $ = cheerio.load(res.text)
-                //console.log(res.text)
                 let trs = $('#' + data.id + ' table tbody tr')
                 
                 trs.each(function (idx, value){
-                    //console.log(value)
                     $value = $(value).find('td')
                     let tmpSingle = {}
                     $value.each(function (idxx, single) {
-                        
                         if(idxx == 0) tmpSingle.location = $(single).text()
                         if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
-                        //console.log(single)
-
-                        
-                        
                     })
 
                     result.push(tmpSingle)
@@ -212,11 +224,8 @@ function getScotlandFromNHS(data){
 
             }
         })
-        
-        
-        
 
-      });
+      })
 
     
 }
