@@ -1,7 +1,6 @@
 # UK Coronavirus Data API
 ![](https://i.ibb.co/Jj2H6wT/logoc.png)
-The live COVID-19 data scraper getting data from government and other sources
-
+A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
 [API Example Figure](http://coronauk.isjeff.com/ "API Example Figure")
 [API Example History](http://coronauk.isjeff.com/history "API Example History")
@@ -9,7 +8,7 @@ The live COVID-19 data scraper getting data from government and other sources
 
 ## Getting Started
 
-This sourcecode require very basic nodejs skill, if you dont, you can just used the example API.
+This sourcecode require very basic nodejs skill, or just use the example API.
 
 1. install mysql database > create a 'corona' database > import 'sample.sql'
 2. rename `conf_tmp.js` to `conf.js`, config mysql username and password
@@ -26,11 +25,11 @@ This sourcecode require very basic nodejs skill, if you dont, you can just used 
 
 
 ## Importance
-1. Due to the announcement structure from the source may constantly changing, all data will be updated to current_shadow table waiting for admin approve. Admin can use link: http://HOST/approve?token= with token in the first row of your user table, to update to official current table.
+1. Due to the announcement channel and structure might constantly changing, new data update will put into current_shadow table waiting for admin approve. Admin need to use link: http://HOST/approve?token= with token in the first row (id=1) of your user table, to update to official current table.
 
-2. The wrong virus related data may cause chaos into the society, and the source data structure is not stable, false data might produced in the automatic process, so you do not want to update without admin approval.
+2. The false data may cause chaos to the public, as it could be produced in this process, please be careful. 
 
-3. As I am not a professional coder, I am welcome if anyone can help me improve this project.
+3. As I am not a professional coder (I am a designer), I am welcome if anyone could help me make improvement. You can contact me through ISSUE page
 
 ## Powered By
 Standard NodeJs + ExpressJs along with superagent, cheerio, node-schedule. Detail is in: package.json.
