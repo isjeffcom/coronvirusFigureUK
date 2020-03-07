@@ -40,11 +40,24 @@ function idIdxsInArr(target, arr){
     return res.length > 0 ? res : -1
 }
 
+function idIdxsInArrWithId(target, arr, id){
+    
+    var res = []
+    for(let i=0;i<arr.length;i++){
+        if(arr[i][id].indexOf(target) != -1){
+            res.push(i)
+        }
+    }
+
+    
+    return res.length > 0 ? res : -1
+}
 
 
 module.exports = {
     deepCopy: deepCopy,
     getTS: getTS,
     idIdxsInArr: idIdxsInArr,
+    idIdxsInArrWithId: idIdxsInArrWithId,
     matchNum: matchNum
 }

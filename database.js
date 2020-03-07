@@ -1,14 +1,9 @@
 const DbClient = require("ali-mysql-client")
 const utils = require('./utils')
+const conf = require('./conf')
 const { stripSlashes } = require('slashes')
 
-const db = new DbClient({
-    host     : 'localhost',
-    user     : '<USERNAME>',
-    password : '<PASSWORD>',
-    database : 'corona',
-    port: "<PORT>"
-})
+const db = new DbClient(conf.getDB())
 
 // Get current number
 async function current(){
@@ -31,6 +26,34 @@ async function current(){
 
     }
 
+}
+
+async function locations(){
+    const result = await db
+    .select("*")
+    .from("geo")
+    .queryList()
+
+    return result ? { status: true, data: result} : { status: false, data: null, err: result }
+
+}
+
+
+async function addLocation(ready){
+    const save = await db
+        .insert("geo", ready)
+        .execute()
+
+    return save ? { status: true, data: null} : { status: false, data: null, err: save }
+}
+
+async function updateLocation(id, data){
+    const result = await db
+    .update("geo", data)
+    .where("id", id)
+    .execute()
+
+    return result ? { status: true, data: null} : { status: false, data: null, err: result }
 }
 
 // Get current number
@@ -151,6 +174,9 @@ module.exports = {
     current: current,
     history: history,
     update: update,
+    locations: locations,
+    addLocation: addLocation,
+    updateLocation: updateLocation,
     updateApprove: updateApprove,
     autoApprove: autoApprove,
     saveHistory: saveHistory,
