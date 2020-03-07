@@ -64,24 +64,59 @@ app.get('/visual', async function (req, res) {
   res.sendFile(path.join(__dirname, 'visual/index.html'))
 })
 
+// Approve shadow data become official data
+app.get('/history', async function (req, res) {
+  let data = fs.readFile(path.join(__dirname, 'data/history.json'), 'utf-8', (err, data)=>{
+    if(err){
+      res.send('an error occur')
+    } else {
+      res.send(data)
+    }
+    return
+  })
+})
+
+
+// On create
+updateData()
+putHistory()
+
+// Update data
 async function updateData(){
-  if(await robot.getData()){
+  let update = await robot.getData()
+  if(update){
     let data = await database.current()
-    fs.writeFile(path.join(__dirname, 'data/data.json'), JSON.stringify(data), ()=>{
+    if(data){
+      fs.writeFile(path.join(__dirname, 'data/data.json'), JSON.stringify(data), ()=>{
+        return true
+      })
+    }
+  }
+}
+
+
+// Put data into history json
+async function putHistory(){
+  let data = await database.history()
+  if(data){
+    fs.writeFile(path.join(__dirname, 'data/history.json'), JSON.stringify(data), ()=>{
       return true
     })
   }
 }
 
-updateData()
 
-
-var updateAll = schedule.scheduleJob('updateall', '01 * * * *', 'Europe/London', function(){
+// Schedule Tasks
+var updateAll = schedule.scheduleJob('updateall', '10 * * * *', 'Europe/London', function(){
   updateData()
+  database.autoApprove()
   return
 })
 
-var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/London', function(){
-  database.saveHistory()
+var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/London', async function(){
+  let save = await database.saveHistory()
+  if(save){
+    putHistory()
+  }
   return
 })

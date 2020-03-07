@@ -3,7 +3,8 @@
 The live COVID-19 data scraper getting data from government and other sources
 
 
-[API Example](http://coronauk.isjeff.com/ "API Example")
+[API Example Figure](http://coronauk.isjeff.com/ "API Example Figure")
+[API Example History](http://coronauk.isjeff.com/history "API Example History")
 [Data Example](http://coronauk.isjeff.com/visual "Data Example")
 
 ## Getting Started
@@ -13,9 +14,13 @@ This sourcecode require very basic nodejs skill, if you dont, you can just used 
 1. install mysql database > create a 'corona' database > import 'sample.sql'
 2. config database info in database.js under 'new DbClient' constructor
 3. install lastest nodejs and run
-	`npm install`
+	`npm i`
 	`node index.js` or `npm run dev`
 4. open `http://localhost:8003`
+
+## Data Visualization Source code
+[covid-19-datav](https://github.com/isjeffcom/covid-19-datav-uk "covid-19-datav")
+
 
 ## Importance
 1. Due to the announcement structure from the source may constantly changing, all data will be updated to current_shadow table waiting for admin approve. Admin can use link: http://HOST/approve?token= with token in the first row of your user table, to update to official current table.
@@ -27,7 +32,8 @@ This sourcecode require very basic nodejs skill, if you dont, you can just used 
 ## Powered By
 Standard NodeJs + ExpressJs along with superagent, cheerio, node-schedule. Detail is in: package.json.
 
-## Current Data Source
+## Data Source
+
 ### Figure
 UK GOV: https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public
 Worldometers: https://www.worldometers.info/coronavirus/

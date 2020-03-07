@@ -51,12 +51,9 @@ function getData(){
     return new Promise(resolve => {
         getDataFromNHS(figure[0])
         getDataFromWDM(figure[1])
+        getAreaData()
         //getEnglandFromNHS(areaData[0])
         //getScotlandFromNHS(areaData[1])
-
-        setTimeout(()=>{
-            getAreaData()
-        }, 2000)
 
         resolve(true)
     })
@@ -156,19 +153,8 @@ function getEnglandFromNHS(data){
                     $value.each(function (idxx, single) {
                         //console.log($(single).text())
                         if(idxx == 0) tmpSingle.location = $(single).text()
-                        
-                        if(idxx == 1){
-                            let tsd = $(single).text()
-                            if(tsd.indexOf("to") != -1){
-                                tsd = tsd.split(" ")
-                                tmpSingle.number = parseInt(tsd[0].replace(/,/g, ""))
-                            } else {
-                                tmpSingle.number = parseInt(tsd.replace(/,/g, ""))
-                            }
-
+                        if(idxx == 1) tmpSingle.number = $(single).text()
                             
-                            
-                        } 
                     })
 
                     // Has data

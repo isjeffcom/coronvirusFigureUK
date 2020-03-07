@@ -10,7 +10,6 @@ const db = new DbClient({
     port: "<PORT>"
 })
 
-
 // Get current number
 async function current(){
 
@@ -32,6 +31,21 @@ async function current(){
 
     }
 
+}
+
+// Get current number
+async function history(){
+
+    const result = await db
+    .select("*")
+    .from("history")
+    .queryList()
+
+    if(result){
+        return { status: true, data: result}
+    } else {
+        return { status: false, data: null, err: result }
+    }
 }
 
 // Update, default to shadow waiting for approvement
@@ -83,6 +97,24 @@ async function updateApprove(){
     return { status: true, data: null, err: null}
 }
 
+async function autoApprove(){
+    const shadow = await db
+    .select("*")
+    .from("current_shadow")
+    .queryList()
+
+    const current = await db
+    .select("*")
+    .from("current")
+    .queryList()
+
+    if(shadow === current){
+        updateApprove()
+    }
+
+    return
+}
+
 async function saveHistory(){
     const result = await db
     .select("*")
@@ -113,10 +145,14 @@ async function saveHistory(){
 }
 
 
+
+
 module.exports = {
     current: current,
+    history: history,
     update: update,
     updateApprove: updateApprove,
+    autoApprove: autoApprove,
     saveHistory: saveHistory,
     getApproveToken: getApproveToken
 }
