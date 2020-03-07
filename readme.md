@@ -13,7 +13,7 @@ This sourcecode require very basic nodejs skill, if you dont, you can just used 
 2. config database info in database.js under 'new DbClient' constructor
 3. install lastest nodejs and run
 	`npm install`
-	`node index.js`
+	`node index.js` or `npm run dev`
 4. open `http://localhost:8003`
 
 ## Importance

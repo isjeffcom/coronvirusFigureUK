@@ -7,7 +7,18 @@ var path = require('path')
 const express = require('express')
 const app = express()
 
+// Set CROS
+app.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Credentials", "true")
+  res.header("Access-Control-Allow-Headers", "X-Requested-With")
+  res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS")
+  res.header("X-Powered-By",' 3.2.1')
+  //res.header("Content-Type", "application/json;charset=utf-8")
+  next()
+})
 
+// Start HTTP server
 let server = app.listen(8003, function () {
   let host = server.address().address;
   let port = server.address().port;
@@ -46,6 +57,11 @@ app.get('/approve', async function (req, res) {
     res.send(JSON.stringify({status: true, data: null}))
     return
   }
+})
+
+// Approve shadow data become official data
+app.get('/visual', async function (req, res) {
+  res.sendFile(path.join(__dirname, 'visual/index.html'))
 })
 
 async function updateData(){
