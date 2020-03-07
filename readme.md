@@ -3,7 +3,8 @@
 The live COVID-19 data scraper getting data from government and other sources
 
 
-[Live Example](http://coronauk.isjeff.com/ "Live Example")
+[API Example](http://coronauk.isjeff.com/ "API Example")
+[Data Example](http://coronauk.isjeff.com/visual "Data Example")
 
 ## Getting Started
 
