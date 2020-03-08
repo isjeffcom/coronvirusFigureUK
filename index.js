@@ -113,6 +113,7 @@ app.get('/visual', async function (req, res) {
 updateData()
 putHistory()
 putLocation()
+//database.saveHistory()
 
 async function getLocations(){
 

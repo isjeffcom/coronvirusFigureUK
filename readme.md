@@ -21,10 +21,6 @@ This sourcecode require very basic nodejs skill, or just use the example API.
 5. you can find all router enterance point in index.js
 
 
-## Data Visualization Source code
-[covid-19-datav](https://github.com/isjeffcom/covid-19-datav-uk "covid-19-datav")
-
-
 ## Importance
 1. Due to the announcement channel and structure might constantly changing, new data update will put into current_shadow table waiting for admin approve. Admin need to use link: http://HOST/approve?token= with token in the first row (id=1) of your user table, to update to official current table.
 

@@ -161,7 +161,7 @@ function getEnglandFromNHS(data){
                     if(tmpSingle['location']){
                         // Not total or wait to be determined
                         // No idea why government put a unconfirm data into a confirm data sort by location chart...
-                        if(tmpSingle.location.indexOf("awaiting clarification") == -1){
+                        if(tmpSingle.location.indexOf("Awaiting confirmation") == -1){
                             result.push(tmpSingle)
                         }
                     }
