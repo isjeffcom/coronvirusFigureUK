@@ -169,10 +169,11 @@ async function updateData(){
           // Do nothing
         })
       }
+      database.autoApprove()
       // Get newer updated location data
       getLocations()
     }
-  }, 10000)
+  }, 5000)
   
 }
 

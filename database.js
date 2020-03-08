@@ -131,8 +131,14 @@ async function autoApprove(){
     .from("current")
     .queryList()
 
-    if(shadow === current){
+    if(shadow[0].confirm === current[0].confirm 
+        && shadow[1].confirm == current[1].confirm 
+        && shadow[0].death == current[0].death 
+        && shadow[1].death == current[1].death){
         updateApprove()
+        console.log("approved")
+    } else {
+        console.log("need approve")
     }
 
     return
