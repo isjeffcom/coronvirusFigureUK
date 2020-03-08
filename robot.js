@@ -237,7 +237,7 @@ function getDataFromWDM(data){
                         if($(single).text().indexOf("UK") != -1){
                             tmp.confirm = parseInt($($value[idxx+1]).text().replace(/,/g, ""))
                             tmp.death = parseInt($($value[idxx+3]).text().replace(/,/g, ""))
-                            tmp.cured = parseInt($($value[idxx+6]).text().replace(/,/g, "")) 
+                            tmp.cured = parseInt($($value[idxx+5]).text().replace(/,/g, "")) 
                             tmp.ts = utils.getTS()
                         }
                     }
