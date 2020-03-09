@@ -14,11 +14,11 @@ This sourcecode require very basic nodejs skill, or just use the example API.
 1. install mysql database > create a 'corona' database > import 'sample.sql'
 2. rename `conf_tmp.js` to `conf.js`, config mysql username and password
 3. create config a mapbox API Token, or disable getLocation() and putLocation() in index.js. This is for getting geolocation center for map data, its kind of essential for doing data visualization.
-3. install lastest nodejs and run
+4. install lastest nodejs and run
 	`npm i`
 	`npm run dev` or just `node index.js`
-4. project will start at `http://localhost:8003`
-5. you can find all router enterance point in index.js
+5. project will start at `http://localhost:8003`
+6. you can find all router enterance point in index.js
 
 
 ## Importance
