@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: 2020-03-08 02:09:59
+-- Generation Time: 2020-03-09 17:57:36
 -- 服务器版本： 5.7.26-log
 -- PHP Version: 5.6.40
 
@@ -31,12 +31,12 @@ CREATE TABLE IF NOT EXISTS `current` (
   `source` text,
   `link` text,
   `domId` text,
-  `confirm` int(11) DEFAULT NULL,
+  `confirmed` int(11) DEFAULT NULL,
   `death` int(11) DEFAULT NULL,
   `cured` int(11) DEFAULT NULL,
-  `icu` int(11) DEFAULT NULL,
-  `nagative` int(11) DEFAULT NULL,
-  `suspect` int(11) DEFAULT NULL,
+  `serious` int(11) DEFAULT NULL,
+  `negative` int(11) DEFAULT NULL,
+  `suspected` int(11) DEFAULT NULL,
   `area` text,
   `ts` bigint(128) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -52,12 +52,12 @@ CREATE TABLE IF NOT EXISTS `current_shadow` (
   `source` text,
   `link` text,
   `domId` text,
-  `confirm` int(11) DEFAULT NULL,
+  `confirmed` int(11) DEFAULT NULL,
   `death` int(11) DEFAULT NULL,
   `cured` int(11) DEFAULT NULL,
-  `icu` int(11) DEFAULT NULL,
-  `nagative` int(11) DEFAULT NULL,
-  `suspect` int(11) DEFAULT NULL,
+  `serious` int(11) DEFAULT NULL,
+  `negative` int(11) DEFAULT NULL,
+  `suspected` int(11) DEFAULT NULL,
   `area` text,
   `ts` bigint(128) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -84,12 +84,12 @@ CREATE TABLE IF NOT EXISTS `geo` (
 CREATE TABLE IF NOT EXISTS `history` (
   `id` int(11) NOT NULL,
   `date` bigint(128) NOT NULL,
-  `confirm` int(11) NOT NULL,
+  `confirmed` int(11) NOT NULL,
   `death` int(11) NOT NULL,
   `cured` int(11) NOT NULL,
-  `icu` int(11) NOT NULL,
-  `nagative` int(11) NOT NULL,
-  `suspect` int(11) NOT NULL,
+  `serious` int(11) NOT NULL,
+  `negative` int(11) NOT NULL,
+  `suspected` int(11) NOT NULL,
   `area` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
