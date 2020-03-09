@@ -1,4 +1,47 @@
+/** 
+ * Develop By Jeff Wu
+ * 2020.03
+ * isjeff.com
+**/
 
+/** 
+ * THE WAY IT WORK
+ * 
+ * 1. update data by robot.js when first started and also scheduled excute
+ * 2-1. IF data from robot has no changed too much, update to 'current' table, and build cache to data/data.json 
+ * 2-2. ELSE save to 'current_shadow' table waiting for approve
+ * 3. Approve data by using /approve with user token, which id: 1 is the admin user and only he can approve to update
+ * 4. Data after update will cached into /data/xxx.json file as aim to reduce database I/O usage
+ * **/
+
+/**
+ * ROUTER
+ * 
+ * /: Default api, output cached data from data/data.json
+ * /locations: location api, output cached location geographic data
+ * /history: history api, output cached history data
+ * /approve: action, save data from 'current_shadow' > 'current'
+ * /visual: send static website, this is for my own use
+ * /admin: admin login, this is for my own use
+ * /all: output both 'current' and 'current_shadow' table
+**/
+
+/** 
+ * SCHEDULE TASKS 
+ * 
+ * updateAll: updaate data, run every hours
+ * recordHistory: record history, run every day
+**/
+
+/** 
+ * VOIDS AND FUNCTIONS
+ * 
+ * updateData: updaate data
+ * put+xx: cache location to /data/xx.json
+**/
+
+
+// IMPORT LIST
 // Database 
 const database = require('./database')
 
@@ -19,6 +62,12 @@ const utils = require('./utils')
 // Express JS
 const express = require('express')
 const app = express()
+var bodyParser = require('body-parser');
+//app.use(bodyParser.json()); // support json encoded bodies
+//app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
+// Runtime
+const process = require('process')
 
 // Conf 
 const conf = require('./conf')
@@ -38,8 +87,28 @@ app.all('*', function(req, res, next) {
 let server = app.listen(8003, function () {
   let host = server.address().address;
   let port = server.address().port;
-  console.log('Your App is running at http://%s:%s', host, port);
+  console.log('Your App is running at http://%s:%s', host, port)
+
+  // Start function
+  onCreate()
+  
 })
+
+// On create
+function onCreate(){
+
+  updateData()
+  
+  process.nextTick(()=>{
+    putHistory()
+  })
+
+  process.nextTick(()=>{
+    putLocation()
+  })
+
+}
+
 
 
 // Main Data
@@ -109,11 +178,81 @@ app.get('/visual', async function (req, res) {
   res.sendFile(path.join(__dirname, 'visual/index.html'))
 })
 
-// On create
-updateData()
-putHistory()
-putLocation()
-//database.saveHistory()
+
+// FOR ADMIN PAGE
+// Admin login
+app.get('/admin', async function (req, res){
+  
+  if(req.query.pin && req.query.token){
+    let q = await database.verifyPin(req.query.pin, req.query.token)
+    if(q){
+      res.send(JSON.stringify(q))
+      return
+    }
+    
+  } else {
+    res.send({status: false, data: null})
+    return
+  }
+})
+
+// Get both current and current_shadow for admin
+app.get('/all', async function (req, res) {
+
+
+  if(!req.query.token){
+    res.send(JSON.stringify({status: false, err: "denied"})) 
+  }
+
+  let tk = await database.getApproveToken()
+  if(req.query.token == tk.data.token){
+    var result
+    let current = await database.current()
+    let shadow = await database.shadow()
+
+    if(current && shadow){
+      result = {
+        status: true, 
+        data: {
+          current: current, 
+          shadow: shadow
+        }
+      }
+    } else {
+      result = {
+        status: false, 
+        data: null, 
+        err: {
+          current: current, 
+          shadow: shadow
+        }}
+    }
+  } else {
+    result = {status: false, err: "denied"}
+  }
+
+  res.send(JSON.stringify(result))
+  return
+  
+})
+
+// Schedule Tasks
+var updateAll = schedule.scheduleJob('updateall', '01 * * * *', 'Europe/London', function(){
+  updateData()
+  setTimeout(()=>{
+    database.autoApprove()
+  }, 20000)
+  return
+})
+
+var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/London', async function(){
+  let save = await database.saveHistory()
+  if(save){
+    putHistory()
+  }
+  return
+})
+
 
 async function getLocations(){
 
@@ -138,7 +277,6 @@ async function getLocations(){
           if(res.status){
             let center = res.data.features[0].center
             
-            let confirm = parseInt(el.number) ? parseInt(el.number) : el.number.split(" ")[0]
             let ready = {
               name: el.location,
               lo: center[0],
@@ -179,7 +317,7 @@ async function updateData(){
 }
 
 
-// Put data into history json
+// Cache history data into history.json
 async function putHistory(){
   let data = await database.history()
   if(data){
@@ -189,6 +327,7 @@ async function putHistory(){
   }
 }
 
+// Cache location data into location.json
 async function putLocation(){
   let data = await database.locations()
   if(data){
@@ -199,19 +338,3 @@ async function putLocation(){
 }
 
 
-// Schedule Tasks
-var updateAll = schedule.scheduleJob('updateall', '01 * * * *', 'Europe/London', function(){
-  updateData()
-  setTimeout(()=>{
-    database.autoApprove()
-  }, 20000)
-  return
-})
-
-var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/London', async function(){
-  let save = await database.saveHistory()
-  if(save){
-    putHistory()
-  }
-  return
-})

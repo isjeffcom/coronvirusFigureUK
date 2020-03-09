@@ -1,11 +1,12 @@
+// Standard data structure for server
 function getStruct () {
     return {
-        confirm: 0,
+        confirmed: 0,
         death: 0,
         cured: 0,
-        icu: 0,
-        nagative: 0,
-        suspect: 0,
+        serious: 0,
+        negative: 0,
+        suspected: 0,
         area: "",
         ts: 0
     }

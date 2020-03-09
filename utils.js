@@ -1,3 +1,4 @@
+// Var for convert text number to arabic number
 const mTxtNumber = [
     [1, "one"],
     [2, "two"],
@@ -11,14 +12,18 @@ const mTxtNumber = [
     [10, "ten"]
 ]
 
+// Deep copy an object
 function deepCopy(val){
     return JSON.parse(JSON.stringify(val))
 }
 
+
+// Get a timestamp
 function getTS () {
     return Date.parse( new Date())
 }
 
+// Convert text number to arabic number
 function matchNum(str){
     var res = -1
     for(let i=0; i<mTxtNumber.length; i++){
@@ -30,6 +35,8 @@ function matchNum(str){
     return res
 }
 
+
+// Id index in array, output all index as an array
 function idIdxsInArr(target, arr){
     var res = []
     for(let i=0;i<arr.length;i++){
@@ -40,6 +47,8 @@ function idIdxsInArr(target, arr){
     return res.length > 0 ? res : -1
 }
 
+
+// Id index in array object, output all index as an array
 function idIdxsInArrWithId(target, arr, id){
     
     var res = []

@@ -14,6 +14,7 @@
     "axios": "^0.19.2",
     "cheerio": "^1.0.0-rc.3",
     "express": "^4.17.1",
+    "md5": "^2.2.1",
     "node-schedule-tz": "^1.2.1-4",
     "slashes": "^2.0.2",
     "superagent": "^5.2.2"

@@ -1,3 +1,30 @@
+/** 
+ * Develop By Jeff Wu
+ * 2020.03
+ * isjeff.com
+**/
+
+/** 
+ * IMPORTANCE
+ * Functions are designed to be collected data from specific website, it could be change fast accroding to source website structure
+ * Keep monitoring the source's data structure and 'current_shadow' table
+**/
+
+/** 
+ * VOIDS AND FUNCTIONS
+ * ENTRANCE: 
+ * getData: get all data, main entrance
+ * getAreaData:  main entrance for getting all area data
+ * 
+ * HELPER
+ * getDataFromNHS: get cases data from Government website
+ * getDataFromWDM: get cases data from Worldometer website
+ * getEnglandFromNHS: get England's area data from Government website
+ * getScotlandFromNHS: get Scotland's area data from Government website
+ * 
+**/
+
+
 // The code in this page could be change fast accroding to source website structure
 // Keep Monitoring the data is important
 
@@ -38,15 +65,6 @@ var areaData = [
     }
 ]
 
-function getFigure(){
-
-    return figure
-}
-
-function getADS(){
-    return areaData
-}
-
 function getData(){
     return new Promise(resolve => {
         getDataFromNHS(figure[0])
@@ -64,8 +82,6 @@ async function getAreaData(){
     const england = await getEnglandFromNHS(areaData[0])
     const scotland = await getScotlandFromNHS(areaData[1])
 
-    
-    
     const res = england.concat(scotland)
     var ready = {
         area: addSlashes(JSON.stringify(res))
@@ -97,25 +113,25 @@ function getDataFromNHS(data){
 
                 // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
                 let cMIdx = utils.idIdxsInArr("positive", txt) // return an array with position with word 'positive'
-                let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with nagative with word 'nagative'
+                let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with negative with word 'negative'
 
                 // Process and save to number
                 
-                let confirm = parseInt(txt[cMIdx[0] - 4].replace(/,/g, ""))
-                let nagative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
+                let confirmed = parseInt(txt[cMIdx[0] - 4].replace(/,/g, ""))
+                let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
                 let death = parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) ? parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) : utils.matchNum(txt[cMIdx[1]-4])
 
                 if(cMIdx != -1){
                     // Final check and put into database
-                    tmp.confirm = confirm ? confirm : -1
-                    tmp.nagative = nagative ? nagative : -1
+                    tmp.confirmed = confirmed ? confirmed : -1
+                    tmp.negative = negative ? negative : -1
                     tmp.death = death ? death : -1
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
                 }
 
-                if(!confirm){
+                if(!confirmed){
                     fs.appendFile('log.txt', 'check data struct' + data.source + '\n')
                 }
     
@@ -124,6 +140,40 @@ function getDataFromNHS(data){
         }
     })
 }
+
+function getDataFromWDM(data){
+
+    var tmp = utils.deepCopy(struct.getStruct())
+
+    superagent.get(data.link).end((err, res) => {
+        if(err){
+
+        }else{
+            let $ = cheerio.load(res.text)
+            let trs = $('table#' + data.id + ' tbody tr')
+
+
+            trs.each(function (idx, value){
+                $value = $(value).find('td');
+                $value.each(function (idxx, single) {
+                    //console.log($(single).text())
+                    if (0 === idxx) {
+                        if($(single).text().indexOf("UK") != -1){
+                            tmp.confirmed = parseInt($($value[idxx+1]).text().replace(/,/g, ""))
+                            tmp.death = parseInt($($value[idxx+3]).text().replace(/,/g, ""))
+                            tmp.cured = parseInt($($value[idxx+5]).text().replace(/,/g, "")) 
+                            tmp.ts = utils.getTS()
+                        }
+                    }
+                })
+            })
+
+            database.update(2, tmp)
+
+        }
+    })
+}
+
 
 function getEnglandFromNHS(data){
 
@@ -217,43 +267,6 @@ function getScotlandFromNHS(data){
 }
 
 
-function getDataFromWDM(data){
-
-    var tmp = utils.deepCopy(struct.getStruct())
-
-    superagent.get(data.link).end((err, res) => {
-        if(err){
-
-        }else{
-            let $ = cheerio.load(res.text)
-            let trs = $('table#' + data.id + ' tbody tr')
-
-
-            trs.each(function (idx, value){
-                $value = $(value).find('td');
-                $value.each(function (idxx, single) {
-                    //console.log($(single).text())
-                    if (0 === idxx) {
-                        if($(single).text().indexOf("UK") != -1){
-                            tmp.confirm = parseInt($($value[idxx+1]).text().replace(/,/g, ""))
-                            tmp.death = parseInt($($value[idxx+3]).text().replace(/,/g, ""))
-                            tmp.cured = parseInt($($value[idxx+5]).text().replace(/,/g, "")) 
-                            tmp.ts = utils.getTS()
-                        }
-                    }
-                })
-            })
-
-            database.update(2, tmp)
-
-        }
-    })
-}
-
-
-
 module.exports={
-    getData: getData,
-    getADS: getADS,
-    getFigure: getFigure
+    getData: getData
 }

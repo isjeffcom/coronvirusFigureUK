@@ -1,3 +1,15 @@
+/** 
+ * Develop By Jeff Wu
+ * 2020.03
+ * isjeff.com
+**/
+
+/** 
+ * VOIDS AND FUNCTIONS
+ * getGet: http get function
+ * contParam: construct get params
+**/
+
 
 var axios = require('axios')
 
