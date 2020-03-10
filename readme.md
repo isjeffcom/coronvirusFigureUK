@@ -29,7 +29,7 @@ This sourcecode require very basic nodejs skill, or just use the example API.
 3. As I am not a professional coder (I am a designer), I am welcome if anyone could help me make improvement. You can contact me through ISSUE page
 
 ## Powered By
-Standard NodeJs + ExpressJs along with superagent, cheerio, node-schedule. Detail is in: package.json.
+Standard NodeJs + Express library along with superagent, cheerio, node-schedule. Detail is in: package.json.
 
 ## Data Source
 
