@@ -5,7 +5,7 @@ A live COVID-19 data scraper API provide function with history, and confirmed ca
 [API Figure](https://coronauk.isjeff.com/ "API Figure") <br>
 [API History](https://coronauk.isjeff.com/history "API History") <br>
 [API Geolocation](https://coronauk.isjeff.com/locations "API Geolocation") <br>
-[Data Example](https://coronauk.isjeff.com/visual "Web Example") <br>
+[Web Example](https://coronauk.isjeff.com/visual "Web Example") <br>
 
 (both http and https are useable)
 
