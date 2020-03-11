@@ -2,10 +2,12 @@
 ![](https://i.ibb.co/Jj2H6wT/logoc.png)
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-[API Figure](http://coronauk.isjeff.com/ "API Figure") <br>
-[API History](http://coronauk.isjeff.com/history "API History") <br>
-[API Geolocation](http://coronauk.isjeff.com/locations "API Geolocation") <br>
-[Data Example](http://coronauk.isjeff.com/visual "Data Example") <br>
+[API Figure](https://coronauk.isjeff.com/ "API Figure") <br>
+[API History](https://coronauk.isjeff.com/history "API History") <br>
+[API Geolocation](https://coronauk.isjeff.com/locations "API Geolocation") <br>
+[Data Example](https://coronauk.isjeff.com/visual "Web Example") <br>
+
+(both http and https are useable)
 
 ## Getting Started
 
@@ -22,23 +24,25 @@ This sourcecode require very basic nodejs skill, or just use the example API.
 
 
 ## Importance
-1. Due to the announcement channel and structure might constantly changing, new data update will put into current_shadow table waiting for admin approve. Admin need to use link: http://HOST/approve?token= with token in the first row (id=1) of your user table, to update to official current table.
+1. Due to the announcement channel and structure might constantly changing, new data update will put into current_shadow table waiting for admin approve. Admin need to `GET`: http://HOST/approve?token= with token in the first row (id=1) of your user table, to update to official current table.
 
-2. The false data may cause chaos to the public, please be careful. 
+2. Use `GET`: http://HOST/update?token= to manually update all data (you need to approve the new data as well)
 
-3. As I am not a professional coder (I am a designer), I am welcome if anyone could help me make improvement. You can contact me through ISSUE page
+3. The false data may cause chaos to the public, please be careful. 
+
+4. As I am not a professional coder (I am a designer), I am welcome if anyone could help me make improvement. You can contact me through ISSUE page
 
 ## Powered By
-Standard NodeJs + ExpressJs along with superagent, cheerio, node-schedule. Detail is in: package.json.
+Standard NodeJs + ExpressJs along with superagent, cheerio, axios, node-schedule. Detail is in: package.json. Admin page sourcecode are not available
 
 ## Data Source
 
 ### Figure
-UK GOV: https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public
-Worldometers: https://www.worldometers.info/coronavirus/
+1. UK GOV: https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public
+2. Worldometers: https://www.worldometers.info/coronavirus/
 
-### Area Data
-England: https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public
-Scotland: https://www.gov.scot/coronavirus-covid-19/
+### Regional Data
+1. England: https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public
+2. Scotland: https://www.gov.scot/coronavirus-covid-19/
 
 

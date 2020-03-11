@@ -154,6 +154,25 @@ app.get('/history', async function (req, res) {
 })
 
 // Approve shadow data become official data
+app.get('/update', async function (req, res) {
+
+  let token = await database.getApproveToken()
+
+  token = token.data.token
+
+  if(req.query.token != token){
+
+    res.send("not allow")
+    return 
+
+  } else {
+    updateData()
+    res.send(JSON.stringify({status: true, data: "update started"}))
+    return
+  }
+})
+
+// Approve shadow data become official data
 app.get('/approve', async function (req, res) {
 
   let token = await database.getApproveToken()
