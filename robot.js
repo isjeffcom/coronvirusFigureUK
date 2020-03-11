@@ -39,7 +39,7 @@ const { addSlashes } = require('slashes');
 const struct = require('./struct.js')
 
 
-var figure = [
+const figure = [
     {
         source: "NHS",
         link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public",
@@ -52,7 +52,7 @@ var figure = [
     }
 ]
 
-var areaData = [
+const areaData = [
     {
         name: "england",
         link: "https://www.gov.uk/government/publications/coronavirus-covid-19-number-of-cases-in-england/coronavirus-covid-19-number-of-cases-in-england",
@@ -60,6 +60,16 @@ var areaData = [
     },
     {
         name: "scotland",
+        link: "https://www.gov.scot/coronavirus-covid-19/",
+        id: "overview"
+    },
+    {
+        name: "wales",
+        link: "https://www.gov.scot/coronavirus-covid-19/",
+        id: "overview"
+    },
+    {
+        name: "northernIreland",
         link: "https://www.gov.scot/coronavirus-covid-19/",
         id: "overview"
     }
