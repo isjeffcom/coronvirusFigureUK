@@ -286,6 +286,7 @@ app.get('/locationupdate', async function (req, res) {
 
   } else {
     putLocation()
+    res.send(JSON.stringify({status: true, data: "update started"}))
     return
   }
 })
@@ -305,6 +306,7 @@ app.get('/historyupdate', async function (req, res) {
   } else {
     putHistory()
     putHistoryFigures()
+    res.send(JSON.stringify({status: true, data: "update started"}))
     return
   }
 })
