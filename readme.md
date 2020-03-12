@@ -11,7 +11,7 @@ A live COVID-19 data scraper API provide function with history, and confirmed ca
 2. History: https://coronauk.isjeff.com/history_figures
 3. Location center: https://coronauk.isjeff.com/locations
 
-(Not Recommented for Front-End Use) <br>
+(Not Recommented for Front-End Use ↓) <br>
 4. History(with regional data): https://coronauk.isjeff.com/history
 <br>
 
