@@ -89,11 +89,35 @@ async function updateLocation(id, data){
     return result ? { status: true, data: null} : { status: false, data: null, err: result }
 }
 
-// Get current number
+// Get all histroy
 async function history(){
 
     const result = await db
     .select("*")
+    .from("history")
+    .queryList()
+
+    if(result){
+        return { status: true, data: result}
+    } else {
+        return { status: false, data: null, err: result }
+    }
+}
+
+// Get all histroy (figures only)
+async function historyFigures(){
+
+    const result = await db
+    .select([
+        "id",
+        "date",
+        "confirmed",
+        "death",
+        "cured",
+        "serious",
+        "negative",
+        "suspected",
+    ])
     .from("history")
     .queryList()
 
@@ -224,6 +248,14 @@ async function saveHistory(){
 
 }
 
+async function saveErr(ready){
+    const save = await db
+        .insert("err", ready)
+        .execute()
+
+    return
+}
+
 
 
 
@@ -231,6 +263,7 @@ module.exports = {
     current: current,
     shadow: shadow,
     history: history,
+    historyFigures: historyFigures,
     update: update,
     locations: locations,
     addLocation: addLocation,
@@ -239,5 +272,6 @@ module.exports = {
     autoApprove: autoApprove,
     saveHistory: saveHistory,
     getApproveToken: getApproveToken,
-    verifyPin: verifyPin
+    verifyPin: verifyPin,
+    saveErr: saveErr
 }

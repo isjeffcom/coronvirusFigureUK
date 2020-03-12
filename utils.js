@@ -62,11 +62,21 @@ function idIdxsInArrWithId(target, arr, id){
     return res.length > 0 ? res : -1
 }
 
+function isJson(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 
 module.exports = {
     deepCopy: deepCopy,
     getTS: getTS,
     idIdxsInArr: idIdxsInArr,
     idIdxsInArrWithId: idIdxsInArrWithId,
-    matchNum: matchNum
+    matchNum: matchNum,
+    isJson: isJson
 }

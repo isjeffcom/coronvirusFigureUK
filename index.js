@@ -101,6 +101,7 @@ function onCreate(){
   
   process.nextTick(()=>{
     putHistory()
+    putHistoryFigures()
   })
 
   process.nextTick(()=>{
@@ -146,6 +147,20 @@ app.get('/history', async function (req, res) {
     if(err){
       res.send('an error occur, try again')
       putHistory()
+    } else {
+      res.send(data)
+    }
+    return
+  })
+})
+
+// Get history (figures only) data
+app.get('/historyfigures', async function (req, res) {
+  
+  let data = fs.readFile(path.join(__dirname, 'data/history_figures.json'), 'utf-8', (err, data)=>{
+    if(err){
+      res.send('an error occur, try again')
+      putHistoryFigures()
     } else {
       res.send(data)
     }
@@ -287,10 +302,11 @@ async function getLocations(){
 
     area.forEach(async el => {
       // If doesnt exist
-      
       if(utils.idIdxsInArrWithId(el.location, geo.data, 'name') == -1){
         
         let loca = encodeURI(el.location)
+
+        
         
         await request.genGet(mapboxAPI+ loca +".json", [{name: "access_token", val: mapboxToken}], (res)=>{
           if(res.status){
@@ -341,6 +357,16 @@ async function putHistory(){
   let data = await database.history()
   if(data){
     fs.writeFile(path.join(__dirname, 'data/history.json'), JSON.stringify(data), ()=>{
+      return true
+    })
+  }
+}
+
+// Cache history data (figures only) into history_figures.json
+async function putHistoryFigures(){
+  let data = await database.historyFigures()
+  if(data){
+    fs.writeFile(path.join(__dirname, 'data/history_figures.json'), JSON.stringify(data), ()=>{
       return true
     })
   }

@@ -38,6 +38,11 @@ const { addSlashes } = require('slashes');
 
 const struct = require('./struct.js')
 
+const timeoutDefault = {
+    response: 0, //delay 0 second
+    deadline: 100000 // 10 second timeout
+}
+
 
 const figure = [
     {
@@ -46,7 +51,7 @@ const figure = [
         id: "number-of-cases"
     },
     {
-        source: "Media",
+        source: "Worldometers",
         link: "https://www.worldometers.info/coronavirus/",
         id: "main_table_countries"
     }
@@ -64,14 +69,14 @@ const areaData = [
         id: "overview"
     },
     {
-        name: "wales",
-        link: "https://www.gov.scot/coronavirus-covid-19/",
-        id: "overview"
+        name: "northernIreland",
+        link: "https://www.publichealth.hscni.net/news/covid-19-coronavirus",
+        id: "situation-in-northern-ireland"
     },
     {
-        name: "northernIreland",
-        link: "https://www.gov.scot/coronavirus-covid-19/",
-        id: "overview"
+        name: "wales",
+        link: "https://phw.nhs.wales/topics/latest-information-on-novel-coronavirus-covid-19/",
+        id: "mura-region-local"
     }
 ]
 
@@ -80,8 +85,12 @@ function getData(){
         getDataFromNHS(figure[0])
         getDataFromWDM(figure[1])
         getAreaData()
+
         //getEnglandFromNHS(areaData[0])
         //getScotlandFromNHS(areaData[1])
+        //getWales(areaData[3])
+        //getNIreland(areaData[2])
+        
 
         resolve(true)
     })
@@ -91,27 +100,38 @@ function getData(){
 async function getAreaData(){
     const england = await getEnglandFromNHS(areaData[0])
     const scotland = await getScotlandFromNHS(areaData[1])
+    const nIreland = await getNIreland(areaData[2])
+    const wales = await getWales(areaData[3])
 
-    const res = england.concat(scotland)
-    var ready = {
-        area: addSlashes(JSON.stringify(res))
+    if(england && scotland && nIreland && wales){
+
+        
+        const res = england.concat(scotland)
+
+        // Wales and Northern Ireland are as one due to there is no regional data available
+        res.push(wales)
+        res.push(nIreland)
+
+        var ready = {
+            area: addSlashes(JSON.stringify(res))
+        }
+
+        database.update(1, ready)
     }
-
-    database.update(1, ready)
-    //console.log(addSlashes(JSON.stringify(ready)))
 }
 
 // get NHS offical data
 function getDataFromNHS(data){
 
-
-    superagent.get(data.link).end((err, res) => {
+    superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
 
         var tmp = utils.deepCopy(struct.getStruct())
 
         if (err) {
-            //console.log(`fail to update - ${err}`)
-            fs.appendFile('log.txt', 'check link' + data.source + '\n')
+
+            recordError(data.name, "timeout", err)
+            return
+
         } else {
 
             let $ = cheerio.load(res.text)
@@ -126,10 +146,20 @@ function getDataFromNHS(data){
                 let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with negative with word 'negative'
 
                 // Process and save to number
-                
                 let confirmed = parseInt(txt[cMIdx[0] - 4].replace(/,/g, ""))
                 let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
                 let death = parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) ? parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) : utils.matchNum(txt[cMIdx[1]-4])
+
+                // Record if Error and return
+                if(isNaN(confirmed) || isNaN(negative) || isNaN(death)){
+                    let errData = {
+                        confirmed: confirmed,
+                        negative: negative,
+                        death: death
+                    }
+                    recordError(data.name, "source struct changed", errData)
+                    return
+                }
 
                 if(cMIdx != -1){
                     // Final check and put into database
@@ -139,10 +169,6 @@ function getDataFromNHS(data){
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
-                }
-
-                if(!confirmed){
-                    fs.appendFile('log.txt', 'check data struct' + data.source + '\n')
                 }
     
             })
@@ -155,9 +181,9 @@ function getDataFromWDM(data){
 
     var tmp = utils.deepCopy(struct.getStruct())
 
-    superagent.get(data.link).end((err, res) => {
+    superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
         if(err){
-
+            recordError(data.name, "timeout", err)
         }else{
             let $ = cheerio.load(res.text)
             let trs = $('table#' + data.id + ' tbody tr')
@@ -173,12 +199,27 @@ function getDataFromWDM(data){
                             tmp.death = parseInt($($value[idxx+3]).text().replace(/,/g, ""))
                             tmp.cured = parseInt($($value[idxx+5]).text().replace(/,/g, "")) 
                             tmp.ts = utils.getTS()
+
+                            // Record if Error and return
+                            if(isNaN(tmp.confirmed) || isNaN(tmp.death) || isNaN(tmp.cured)){
+                                let errData = {
+                                    confirmed: tmp.confirmed,
+                                    death: tmp.death,
+                                    cured: tmp.cured,
+                                }
+                                recordError(data.name, "source struct changed", errData)
+                                return
+                            }
+
+
+                            database.update(2, tmp)
+                            return
                         }
                     }
                 })
             })
 
-            database.update(2, tmp)
+            
 
         }
     })
@@ -191,9 +232,10 @@ function getEnglandFromNHS(data){
 
         var result = []
 
-        superagent.get(data.link).end((err, res) => {
+        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
-
+                recordError(data.name, "timeout", err)
+                resolve(false)
             }else{
                 
                 let $ = cheerio.load(res.text)
@@ -247,9 +289,10 @@ function getScotlandFromNHS(data){
 
         var result = []
 
-        superagent.get(data.link).end((err, res) => {
+        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
-
+                recordError(data.name, "timeout", err)
+                resolve(false)
             }else{
                 
                 let $ = cheerio.load(res.text)
@@ -274,6 +317,102 @@ function getScotlandFromNHS(data){
       })
 
     
+}
+
+// As Wales gov didnt provided regional data (I couldt find it anyway, Wales was treat as a whole area)
+// Only return wales number only
+function getWales(data){
+
+    return new Promise(resolve => {
+
+        var result = 0
+
+        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
+            if(err){
+                recordError(data.name, "timeout", res)
+                resolve(false)
+            }else{
+                
+                let $ = cheerio.load(res.text)
+                let trs = $('.' + data.id + ' p')
+
+                trs.each(function (idx, value){
+
+                    $value = $(value)
+
+                    let tmpSingle = {}
+
+                    $value.each(function (idxx, single) {
+                        let txt = $(single).text()
+                        if(txt.indexOf('total number of confirmed cases') != -1){
+                            let txtBuff = txt.split(' ')
+                            let txtBuffIndex = txtBuff.indexOf('cases')
+
+                            result = parseInt(txtBuff[txtBuffIndex+4])
+                        }
+                    })
+
+                })
+
+                resolve({location: "Wales", number: result})
+
+            }
+        })
+
+    })
+}
+
+function getNIreland(data){
+
+    return new Promise(resolve => {
+
+        var result = 0
+
+        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
+            if(err){
+                recordError(data.name, "timeout", res)
+                resolve(false)
+            }else{
+                
+                let $ = cheerio.load(res.text)
+                let trs = $('h2#' + data.id).next().next()
+                let txt = $(trs).text()
+                txt = txt.split(" ")
+
+                let txtIndex = txt.indexOf("positive")
+
+                // Maybe with ending period, ready for not
+                txtIndex = txtIndex == -1 ? txt.indexOf("positive.") : txtIndex
+                result = parseInt(txt[txtIndex-1])
+
+                resolve({location: "Northern Ireland", number: result})
+
+            }
+        })
+
+    })
+}
+
+function recordError(source, reason, data){
+
+    try{
+        let ready = {
+            source: source,
+            reason: reason,
+            data: utils.isJson(data) ? JSON.stringify(data) : String(data)
+        }
+    
+        // Prevent too long
+        if(ready.data.length > 1000){
+            ready.data = "too many, check: " + source
+        }
+    
+        database.saveErr(ready)
+    } catch{
+        // do nothing...
+        // dont stop main thread
+    }
+
 }
 
 
