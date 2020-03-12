@@ -106,13 +106,13 @@ async function getAreaData(){
     if(england && scotland && nIreland && wales){
 
         
-        const res = england.concat(scotland)
+        let res = england.concat(scotland)
 
         // Wales and Northern Ireland are as one due to there is no regional data available
         res.push(wales)
         res.push(nIreland)
 
-        var ready = {
+        let ready = {
             area: addSlashes(JSON.stringify(res))
         }
 
