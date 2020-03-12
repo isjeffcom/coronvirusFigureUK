@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: 2020-03-12 08:43:25
+-- Generation Time: 2020-03-13 01:05:31
 -- 服务器版本： 5.7.26-log
 -- PHP Version: 5.6.40
 
@@ -60,6 +60,19 @@ CREATE TABLE IF NOT EXISTS `current_shadow` (
   `suspected` int(11) DEFAULT NULL,
   `area` text,
   `ts` bigint(128) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `err`
+--
+
+CREATE TABLE IF NOT EXISTS `err` (
+  `id` int(11) NOT NULL,
+  `source` text NOT NULL,
+  `reason` text NOT NULL,
+  `detail` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -123,6 +136,12 @@ ALTER TABLE `current_shadow`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `err`
+--
+ALTER TABLE `err`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `geo`
 --
 ALTER TABLE `geo`
@@ -153,6 +172,11 @@ ALTER TABLE `current`
 -- AUTO_INCREMENT for table `current_shadow`
 --
 ALTER TABLE `current_shadow`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `err`
+--
+ALTER TABLE `err`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `geo`
