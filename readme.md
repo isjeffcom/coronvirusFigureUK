@@ -2,11 +2,17 @@
 ![](https://i.ibb.co/Jj2H6wT/logoc.png)
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-[API Figure](https://coronauk.isjeff.com/ "API Figure") <br>
-[API History](https://coronauk.isjeff.com/history "API History") <br>
-[API Geolocation](https://coronauk.isjeff.com/locations "API Geolocation") <br>
-[Web Example](https://coronauk.isjeff.com/visual "Web Example") <br>
+## API LIST
 
+1. Current Figure: https://coronauk.isjeff.com/ 
+2. History: https://coronauk.isjeff.com/history_figures
+3. Location center: https://coronauk.isjeff.com/locations
+
+(Not Recommented for Front-End Use)
+4. History(with regional data): https://coronauk.isjeff.com/history
+<br>
+
+[Web Example](https://coronauk.isjeff.com/visual "Web Example") <br>
 (HTTPS/SSL available)
 
 ## Getting Started
@@ -34,6 +40,12 @@ This sourcecode require very basic nodejs skill, or just use the example API.
 
 ## Powered By
 Standard NodeJs + ExpressJs along with superagent, cheerio, axios, node-schedule. Detail is in: package.json. Admin page sourcecode are not available
+
+
+## Contact
+If you are using this API, please join this discussion board. Keep updated for any significant changes!! <br>
+https://spectrum.chat/covid-19-uk-update
+
 
 ## Data Source
 
