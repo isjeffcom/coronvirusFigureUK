@@ -1,5 +1,5 @@
 # UK Coronavirus Data API
-![](https://i.ibb.co/Jj2H6wT/logoc.png)
+<img src="https://i.ibb.co/Jj2H6wT/logoc.png" width="50%">
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
 [Web Example](https://coronauk.isjeff.com/visual "Web Example") <br>
@@ -45,7 +45,9 @@ Standard NodeJs + ExpressJs along with superagent, cheerio, axios, node-schedule
 ## Contact
 If you are using this API, please join this discussion board. Keep updated for any significant changes!! <br>
 https://spectrum.chat/covid-19-uk-update
-
+<br><br>
+WeChat Group:<br>
+<img src="https://i.ibb.co/TgSHxK5/IMG-7184.jpg" width="20%">
 
 ## Data Source
 
