@@ -2,18 +2,18 @@
 ![](https://i.ibb.co/Jj2H6wT/logoc.png)
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
+[Web Example](https://coronauk.isjeff.com/visual "Web Example") <br>
+(HTTPS/SSL available)
+
 ## API LIST
 
 1. Current Figure: https://coronauk.isjeff.com/ 
 2. History: https://coronauk.isjeff.com/history_figures
 3. Location center: https://coronauk.isjeff.com/locations
 
-(Not Recommented for Front-End Use)
+(Not Recommented for Front-End Use) <br>
 4. History(with regional data): https://coronauk.isjeff.com/history
 <br>
-
-[Web Example](https://coronauk.isjeff.com/visual "Web Example") <br>
-(HTTPS/SSL available)
 
 ## Getting Started
 
