@@ -20,10 +20,14 @@
  * /: Default api, output cached data from data/data.json
  * /locations: location api, output cached location geographic data
  * /history: history api, output cached history data
+ * /historyfigures: history api, output cached history figures data
  * /approve: action, save data from 'current_shadow' > 'current'
  * /visual: send static website, this is for my own use
  * /admin: admin login, this is for my own use
  * /all: output both 'current' and 'current_shadow' table
+ * /update: Manually Update Data for admin
+ * /locationupdate: Manually update location cache
+ * /historyupdate: Manually update history cache
 **/
 
 /** 
@@ -62,9 +66,7 @@ const utils = require('./utils')
 // Express JS
 const express = require('express')
 const app = express()
-var bodyParser = require('body-parser');
-//app.use(bodyParser.json()); // support json encoded bodies
-//app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
 
 // Runtime
 const process = require('process')
@@ -109,8 +111,6 @@ function onCreate(){
   })
 
 }
-
-
 
 // Main Data
 app.get('/', async function (req, res) {
@@ -168,44 +168,7 @@ app.get('/historyfigures', async function (req, res) {
   })
 })
 
-// Approve shadow data become official data
-app.get('/update', async function (req, res) {
 
-  let token = await database.getApproveToken()
-
-  token = token.data.token
-
-  if(req.query.token != token){
-
-    res.send("not allow")
-    return 
-
-  } else {
-    updateData()
-    res.send(JSON.stringify({status: true, data: "update started"}))
-    return
-  }
-})
-
-// Approve shadow data become official data
-app.get('/approve', async function (req, res) {
-
-  let token = await database.getApproveToken()
-
-  token = token.data.token
-
-  if(req.query.token != token){
-
-    res.send("not allow")
-    return 
-
-  } else {
-    database.updateApprove()
-    updateData()
-    res.send(JSON.stringify({status: true, data: null}))
-    return
-  }
-})
 
 // Go to visual
 app.get('/visual', async function (req, res) {
@@ -213,7 +176,7 @@ app.get('/visual', async function (req, res) {
 })
 
 
-// FOR ADMIN PAGE
+// FOR ADMIN FUNCTIONS
 // Admin login
 app.get('/admin', async function (req, res){
   
@@ -270,6 +233,82 @@ app.get('/all', async function (req, res) {
   
 })
 
+// Approve shadow data become official data
+app.get('/approve', async function (req, res) {
+
+  let token = await database.getApproveToken()
+
+  token = token.data.token
+
+  if(req.query.token != token){
+
+    res.send("not allow")
+    return 
+
+  } else {
+    database.updateApprove()
+    updateData()
+    res.send(JSON.stringify({status: true, data: null}))
+    return
+  }
+})
+
+// Manually Update Data for admin
+app.get('/update', async function (req, res) {
+
+  let token = await database.getApproveToken()
+
+  token = token.data.token
+
+  if(req.query.token != token){
+
+    res.send("not allow")
+    return 
+
+  } else {
+    updateData()
+    res.send(JSON.stringify({status: true, data: "update started"}))
+    return
+  }
+})
+
+// Manually update location cache for admin
+app.get('/locationupdate', async function (req, res) {
+
+  let token = await database.getApproveToken()
+
+  token = token.data.token
+
+  if(req.query.token != token){
+
+    res.send("not allow")
+    return 
+
+  } else {
+    putLocation()
+    return
+  }
+})
+
+// Manually update history cache for admin
+app.get('/historyupdate', async function (req, res) {
+
+  let token = await database.getApproveToken()
+
+  token = token.data.token
+
+  if(req.query.token != token){
+
+    res.send("not allow")
+    return 
+
+  } else {
+    putHistory()
+    putHistoryFigures()
+    return
+  }
+})
+
 // Schedule Tasks
 var updateAll = schedule.scheduleJob('updateall', '01 * * * *', 'Europe/London', function(){
   updateData()
@@ -283,6 +322,7 @@ var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/Lo
   let save = await database.saveHistory()
   if(save){
     putHistory()
+    putHistoryFigures()
   }
   return
 })
@@ -325,6 +365,8 @@ async function getLocations(){
       }
     })
   }
+  // Cache to json
+  putLocation()
   
 }
 
