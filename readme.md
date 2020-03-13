@@ -38,6 +38,8 @@ This sourcecode require very basic nodejs skill, or just use the example API.
 
 4. As I am not a professional coder (I am a designer), I am welcome if anyone could help me make improvement. You can contact me through ISSUE page
 
+5. If you are using this API, please be make sure data has cache and fault tolerance was considered. This is API is not completely reliable at all time.
+
 ## Powered By
 Standard NodeJs + ExpressJs along with superagent, cheerio, axios, node-schedule. Detail is in: package.json. Admin page sourcecode are not available
 

@@ -347,8 +347,6 @@ async function getLocations(){
       if(utils.idIdxsInArrWithId(el.location, geo.data, 'name') == -1){
         
         let loca = encodeURI(el.location)
-
-        
         
         await request.genGet(mapboxAPI+ loca +".json", [{name: "access_token", val: mapboxToken}], (res)=>{
           if(res.status){

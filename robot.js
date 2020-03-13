@@ -31,7 +31,6 @@
 // import
 const superagent= require('superagent')
 const cheerio = require('cheerio')
-const fs = require('fs')
 const utils = require('./utils')
 const database = require('./database')
 const { addSlashes } = require('slashes');
@@ -75,8 +74,8 @@ const areaData = [
     },
     {
         name: "wales",
-        link: "https://phw.nhs.wales/topics/latest-information-on-novel-coronavirus-covid-19/",
-        id: "mura-region-local"
+        link: "https://gov.wales/written-statement-coronavirus-covid-19-1",
+        id: "announcement-item__article"
     }
 ]
 
@@ -109,14 +108,16 @@ async function getAreaData(){
         let res = england.concat(scotland)
 
         // Wales and Northern Ireland are as one due to there is no regional data available
-        res.push(wales)
-        res.push(nIreland)
-
+        if(wales) res.push(wales)
+        if(nIreland) res.push(nIreland)
+        
         let ready = {
             area: addSlashes(JSON.stringify(res))
         }
 
-        database.update(1, ready)
+        if(ready.area != "" || ready.area.length > 0){
+            database.update(1, ready)
+        }
     }
 }
 
@@ -334,9 +335,21 @@ function getWales(data){
             }else{
                 
                 let $ = cheerio.load(res.text)
-                let trs = $('.' + data.id + ' p')
+                let trs = $('#' + data.id + ' div')
 
-                trs.each(function (idx, value){
+                let c = $($(trs)[0]).find('div')[2]
+                trs = ($(c).children()[2])
+
+                let txt = $(trs).text()
+                if(txt.indexOf("total") != -1){
+                    txt = txt.split(" ")
+                    let idx = txt.indexOf("cases")
+                    result = parseInt(txt[idx+2])
+                    
+                } else {
+                    result = null
+                }
+                /*trs.each(function (idx, value){
 
                     $value = $(value)
 
@@ -352,7 +365,7 @@ function getWales(data){
                         }
                     })
 
-                })
+                })*/
 
                 resolve({location: "Wales", number: result})
 
@@ -396,10 +409,11 @@ function getNIreland(data){
 function recordError(source, reason, data){
 
     try{
+
         let ready = {
             source: source,
             reason: reason,
-            data: utils.isJson(data) ? JSON.stringify(data) : String(data)
+            detail: utils.isJson(data) ? JSON.stringify(data) : String(data)
         }
     
         // Prevent too long
