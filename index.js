@@ -172,7 +172,9 @@ app.get('/historyfigures', async function (req, res) {
 
 // Go to visual
 app.get('/visual', async function (req, res) {
-  res.sendFile(path.join(__dirname, 'visual/index.html'))
+  //res.sendFile(path.join(__dirname, 'visual/index.html'))
+  res.redirect("https://covid19uk.live");
+  return;
 })
 
 
