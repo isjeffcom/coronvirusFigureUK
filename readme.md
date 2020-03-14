@@ -2,8 +2,7 @@
 <img src="https://i.ibb.co/Jj2H6wT/logoc.png" width="50%">
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-[Web Example](https://coronauk.isjeff.com/visual "Web Example") <br>
-(HTTPS/SSL available)
+[Web Example](http://covid19uk.live/ "Web Example") <br>
 
 ## API LIST
 
