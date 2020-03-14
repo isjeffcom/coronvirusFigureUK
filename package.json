@@ -13,6 +13,7 @@
     "ali-mysql-client": "^1.0.3",
     "axios": "^0.19.2",
     "cheerio": "^1.0.0-rc.3",
+    "csv-parser": "^2.3.2",
     "express": "^4.17.1",
     "md5": "^2.2.1",
     "node-schedule-tz": "^1.2.1-4",

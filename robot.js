@@ -33,7 +33,8 @@ const superagent= require('superagent')
 const cheerio = require('cheerio')
 const utils = require('./utils')
 const database = require('./database')
-const { addSlashes } = require('slashes');
+const { addSlashes } = require('slashes')
+const csv = require('csv-parser')
 
 const struct = require('./struct.js')
 
@@ -59,8 +60,8 @@ const figure = [
 const areaData = [
     {
         name: "england",
-        link: "https://www.gov.uk/government/publications/coronavirus-covid-19-number-of-cases-in-england/coronavirus-covid-19-number-of-cases-in-england",
-        id: "table-of-confirmed-cases-of-covid-19-in-england"
+        link: "http://www.arcgis.com/sharing/rest/content/items/b684319181f94875a6879bbc833ca3a6/data",
+        id: "download-csv-file"
     },
     {
         name: "scotland",
@@ -102,6 +103,7 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
+
     if(england && scotland && nIreland && wales){
 
         
@@ -114,6 +116,7 @@ async function getAreaData(){
         let ready = {
             area: addSlashes(JSON.stringify(res))
         }
+
 
         if(ready.area != "" || ready.area.length > 0){
             database.update(1, ready)
@@ -226,8 +229,43 @@ function getDataFromWDM(data){
     })
 }
 
-
 function getEnglandFromNHS(data){
+    return new Promise(resolve => {
+
+        var results = []
+
+        const http = require('http');
+        const fs = require('fs');
+
+        const file = fs.createWriteStream("england_data.csv");
+        const request = http.get(data.link, function(response) {
+            if(response.statusCode == 200){
+
+                response.pipe(file)
+                //console.log(csv(file))
+
+                fs.createReadStream('england_data.csv')
+                .pipe(csv())
+                .on('data', (data) => {
+                    let tmp = {location: data.GSS_NM, number: data.TotalCases}
+                    results.push(tmp)
+                })
+                .on('end', () => {
+                    //console.log(results)
+                    resolve(results)
+                })
+            } else {
+                resolve(false)
+            }
+        }).on("error", ()=>{
+            resolve(false)
+        })
+
+    })
+}
+
+
+/*function getEnglandFromNHS(data){
 
     return new Promise(resolve => {
 
@@ -280,9 +318,7 @@ function getEnglandFromNHS(data){
         })
 
     })
-
-    
-}
+}*/
 
 function getScotlandFromNHS(data){
 

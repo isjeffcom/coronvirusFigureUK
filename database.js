@@ -209,7 +209,8 @@ async function autoApprove(){
         && shadow[0].death == current[0].death 
         && shadow[1].death == current[1].death
         && shadow[0].cured == current[0].cured 
-        && shadow[1].cured == current[1].cured){
+        && shadow[1].cured == current[1].cured
+        && shadow[0].area == current[0].area){
         updateApprove()
         console.log("approved")
     } else {
