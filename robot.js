@@ -428,11 +428,15 @@ function getNIreland(data){
                 let txt = $(trs).text()
                 txt = txt.split(" ")
 
-                let txtIndex = txt.indexOf("positive")
+                
+
+                let txtIndex = txt.indexOf("total")
 
                 // Maybe with ending period, ready for not
-                txtIndex = txtIndex == -1 ? txt.indexOf("positive.") : txtIndex
-                result = parseInt(txt[txtIndex-1])
+                //txtIndex = txtIndex == -1 ? txt.indexOf("positive.") : txtIndex
+                result = parseInt(txt[txtIndex+8])
+
+                console.log(result)
 
                 resolve({location: "Northern Ireland", number: result})
 
