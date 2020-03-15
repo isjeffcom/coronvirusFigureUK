@@ -7,7 +7,7 @@ A live COVID-19 data scraper API provide function with history, and confirmed ca
 ## API LIST
 
 1. Current Figure: https://coronauk.isjeff.com/ 
-2. History: https://coronauk.isjeff.com/history_figures
+2. History: https://coronauk.isjeff.com/historyfigures
 3. Location center: https://coronauk.isjeff.com/locations
 
 (Not Recommented for Front-End Use ↓) <br>
