@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: 2020-03-13 01:05:31
+-- Generation Time: 2020-03-15 04:33:57
 -- 服务器版本： 5.7.26-log
 -- PHP Version: 5.6.40
 
@@ -37,6 +37,10 @@ CREATE TABLE IF NOT EXISTS `current` (
   `serious` int(11) DEFAULT NULL,
   `negative` int(11) DEFAULT NULL,
   `suspected` int(11) DEFAULT NULL,
+  `england` int(11) DEFAULT NULL,
+  `scotland` int(11) DEFAULT NULL,
+  `wales` int(11) DEFAULT NULL,
+  `nireland` int(11) DEFAULT NULL,
   `area` text,
   `ts` bigint(128) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -58,6 +62,10 @@ CREATE TABLE IF NOT EXISTS `current_shadow` (
   `serious` int(11) DEFAULT NULL,
   `negative` int(11) DEFAULT NULL,
   `suspected` int(11) DEFAULT NULL,
+  `england` int(11) DEFAULT NULL,
+  `scotland` int(11) DEFAULT NULL,
+  `wales` int(11) DEFAULT NULL,
+  `nireland` int(11) DEFAULT NULL,
   `area` text,
   `ts` bigint(128) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -103,6 +111,10 @@ CREATE TABLE IF NOT EXISTS `history` (
   `serious` int(11) NOT NULL,
   `negative` int(11) NOT NULL,
   `suspected` int(11) NOT NULL,
+  `england` int(11) DEFAULT NULL,
+  `scotland` int(11) DEFAULT NULL,
+  `wales` int(11) DEFAULT NULL,
+  `nireland` int(11) DEFAULT NULL,
   `area` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
