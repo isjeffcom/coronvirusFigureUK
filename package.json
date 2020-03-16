@@ -15,8 +15,10 @@
     "cheerio": "^1.0.0-rc.3",
     "csv-parser": "^2.3.2",
     "express": "^4.17.1",
+    "follow-redirects": "^1.10.0",
     "md5": "^2.2.1",
     "node-schedule-tz": "^1.2.1-4",
+    "read-excel-file": "^4.0.6",
     "slashes": "^2.0.2",
     "superagent": "^5.2.2"
   }

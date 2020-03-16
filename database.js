@@ -204,13 +204,15 @@ async function autoApprove(){
     .from("current")
     .queryList()
 
-    if(shadow[0].confirmed === current[0].confirmed
-        && shadow[1].confirmed == current[1].confirmed 
-        && shadow[0].death == current[0].death 
-        && shadow[1].death == current[1].death
-        && shadow[0].cured == current[0].cured 
-        && shadow[1].cured == current[1].cured
-        && shadow[0].area == current[0].area){
+    let confirmed1 = compare(shadow[0].confirmed, current[0].confirmed)
+    let death1 = compare(shadow[0].death, current[0].death)
+    let cured1 = compare(shadow[0].cured, current[0].cured)
+    let confirmed2 = compare(shadow[1].confirmed, current[1].confirmed)
+    let death2 = compare(shadow[1].death, current[1].death)
+    let cured2 = compare(shadow[1].cured, current[1].cured)
+
+
+    if(confirmed1 && confirmed2 && death1 && death2 && cured1 && cured2 && noNull(shadow[0].area)){
         updateApprove()
         console.log("approved")
     } else {
@@ -218,6 +220,32 @@ async function autoApprove(){
     }
 
     return
+}
+
+function compare(num1, num2){
+
+    if(num1 == null || num1 == "" || isNaN(num1) || num1 == "null" || typeof num1 == null || typeof num1 == undefined || num1 == undefined){
+        return false
+    }
+
+    const notMuch = 70
+
+    if(num1 > num2 && (num1 - num2) < notMuch){
+        return true
+    } else {
+        return false
+    }
+}
+
+function noNull (a) {
+    let d = JSON.parse(a)
+    for(let i=0;i<area.length;i++){
+        if(d.location == "" || d.location == "null" || d.number.length == "" || d.number == "null" || !isNaN(d.number)){
+            return false
+        }
+    }
+
+    return true
 }
 
 async function saveHistory(){

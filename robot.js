@@ -35,6 +35,9 @@ const utils = require('./utils')
 const database = require('./database')
 const { addSlashes } = require('slashes')
 const csv = require('csv-parser')
+const fs = require('fs');
+
+const { http, https } = require('follow-redirects');
 
 const struct = require('./struct.js')
 
@@ -48,6 +51,7 @@ const figure = [
     {
         source: "NHS",
         link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public",
+        more: "http://www.arcgis.com/sharing/rest/content/items/bc8ee90225644ef7a6f4dd1b13ea1d67/data",
         id: "number-of-cases"
     },
     {
@@ -83,6 +87,7 @@ const areaData = [
 function getData(){
     return new Promise(resolve => {
         getDataFromNHS(figure[0])
+        getMoreFromNHS(figure[0]) // Get death and 4 nations data
         getDataFromWDM(figure[1])
         getAreaData()
 
@@ -123,6 +128,70 @@ async function getAreaData(){
     }
 }
 
+function getMoreFromNHS(data){
+    return new Promise(resolve => {
+
+        var ready = {
+            death: 0,
+            england: 0,
+            scotland: 0,
+            wales: 0,
+            nireland: 0
+        }
+        
+        const readXlsxFile = require('read-excel-file/node');
+
+        const file = fs.createWriteStream("nation.xlsx");
+
+        const request = http.get(data.more, response => {
+            if(response.statusCode == 200){
+                response.pipe(file)
+
+                // Readable Stream.
+                readXlsxFile(fs.createReadStream('nation.xlsx')).then((rows) => {
+                    if(rows.length > 0){
+                        for(let i=0;i<rows[0].length;i++){
+                            if(rows[0][i] == "TotalUKDeaths"){
+                                ready.death = rows[1][i]
+
+                            } 
+
+                            else if(rows[0][i] == "EnglandCases"){
+                                ready.england = rows[1][i]
+                            }
+
+                            else if(rows[0][i] == "ScotlandCases"){
+                                ready.scotland = rows[1][i]
+                            }
+
+                            else if(rows[0][i] == "WalesCases"){
+                                ready.wales = rows[1][i]
+                            }
+
+                            else if(rows[0][i] == "NICases"){
+                                ready.nireland = rows[1][i]
+                            }
+                            
+                        }
+
+                        database.update(1, ready)
+                        resolve(true)
+                    } else {
+                        resolve(false)
+                    }
+                    
+                })
+
+            } else {
+                resolve(false)
+            }
+        }).on('error', err => {
+            console.error(err)
+        })
+
+    })
+}
+
 // get NHS offical data
 function getDataFromNHS(data){
 
@@ -132,7 +201,7 @@ function getDataFromNHS(data){
 
         if (err) {
 
-            recordError(data.name, "timeout", err)
+            recordError(data.source, "timeout", err)
             return
 
         } else {
@@ -148,23 +217,36 @@ function getDataFromNHS(data){
                 let cMIdx = utils.idIdxsInArr("positive", txt) // return an array with position with word 'positive'
                 let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with negative with word 'negative'
 
-                // Process and save to number
-                let confirmed = parseInt(txt[cMIdx[0] - 4].replace(/,/g, ""))
-                let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
-                let death = parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) ? parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) : utils.matchNum(txt[cMIdx[1]-4])
+                if(cMIdx != -1 
+                    && nMIdx != -1 
+                    && cMIdx.length > 0 
+                    && nMIdx.length > 0 
+                    && txt.length>0){
 
-                // Record if Error and return
-                if(isNaN(confirmed) || isNaN(negative) || isNaN(death)){
-                    let errData = {
-                        confirmed: confirmed,
-                        negative: negative,
-                        death: death
+                    // Process and save to number
+                    let confirmed = parseInt(txt[cMIdx[0] - 4].replace(/,/g, ""))
+                    let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
+                    let death = 0
+
+                    if(cMIdx.length > 1){
+                        death = parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) ? parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) : utils.matchNum(txt[cMIdx[1]-4])
+                    } else {
+                        recordError(data.source, "no death", txt)
                     }
-                    recordError(data.name, "source struct changed", errData)
-                    return
-                }
+                    
+                    
 
-                if(cMIdx != -1){
+                    // Record if Error and return
+                    if(isNaN(confirmed) || isNaN(negative) || isNaN(death)){
+                        let errData = {
+                            confirmed: confirmed,
+                            negative: negative,
+                            death: death
+                        }
+                        recordError(data.source, "source struct changed", errData)
+                        return
+                    }
+
                     // Final check and put into database
                     tmp.confirmed = confirmed ? confirmed : -1
                     tmp.negative = negative ? negative : -1
@@ -172,6 +254,8 @@ function getDataFromNHS(data){
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
+                
+                
                 }
     
             })
@@ -186,7 +270,7 @@ function getDataFromWDM(data){
 
     superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
         if(err){
-            recordError(data.name, "timeout", err)
+            recordError(data.source, "timeout", err)
         }else{
             let $ = cheerio.load(res.text)
             let trs = $('table#' + data.id + ' tbody tr')
@@ -195,7 +279,7 @@ function getDataFromWDM(data){
             trs.each(function (idx, value){
                 $value = $(value).find('td');
                 $value.each(function (idxx, single) {
-                    //console.log($(single).text())
+
                     if (0 === idxx) {
                         if($(single).text().indexOf("UK") != -1){
                             tmp.confirmed = parseInt($($value[idxx+1]).text().replace(/,/g, ""))
@@ -210,7 +294,7 @@ function getDataFromWDM(data){
                                     death: tmp.death,
                                     cured: tmp.cured,
                                 }
-                                recordError(data.name, "source struct changed", errData)
+                                recordError(data.source, "source struct changed", errData)
                                 return
                             }
 
@@ -234,14 +318,13 @@ function getEnglandFromNHS(data){
         var results = []
 
         const http = require('http');
-        const fs = require('fs');
 
         const file = fs.createWriteStream("england_data.csv");
         const request = http.get(data.link, function(response) {
             if(response.statusCode == 200){
 
                 response.pipe(file)
-                //console.log(csv(file))
+
 
                 fs.createReadStream('england_data.csv')
                 .pipe(csv())
@@ -250,7 +333,7 @@ function getEnglandFromNHS(data){
                     results.push(tmp)
                 })
                 .on('end', () => {
-                    //console.log(results)
+
                     resolve(results)
                 })
             } else {
@@ -271,7 +354,7 @@ function getScotlandFromNHS(data){
 
         superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
-                recordError(data.name, "timeout", err)
+                recordError(data.source, "timeout", err)
                 resolve(false)
             }else{
                 
@@ -309,7 +392,7 @@ function getWales(data){
 
         superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
-                recordError(data.name, "timeout", res)
+                recordError(data.source, "timeout", res)
                 resolve(false)
             }else{
                 
@@ -362,7 +445,7 @@ function getNIreland(data){
 
         superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
-                recordError(data.name, "timeout", res)
+                recordError(data.source, "timeout", res)
                 resolve(false)
             }else{
                 
@@ -388,18 +471,20 @@ function getNIreland(data){
 function recordError(source, reason, data){
 
     try{
-
+        
         let ready = {
             source: source,
             reason: reason,
             detail: utils.isJson(data) ? JSON.stringify(data) : String(data)
         }
+
+        
     
         // Prevent too long
-        if(ready.data.length > 1000){
-            ready.data = "too many, check: " + source
+        if(ready.detail.length > 1000){
+            ready.detail = "too many, check: " + source
         }
-    
+        
         database.saveErr(ready)
     } catch{
         // do nothing...
