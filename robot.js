@@ -91,7 +91,6 @@ function getData(){
         //getWales(areaData[3])
         //getNIreland(areaData[2])
         
-
         resolve(true)
     })
     
@@ -263,62 +262,6 @@ function getEnglandFromNHS(data){
 
     })
 }
-
-
-/*function getEnglandFromNHS(data){
-
-    return new Promise(resolve => {
-
-        var result = []
-
-        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
-            if(err){
-                recordError(data.name, "timeout", err)
-                resolve(false)
-            }else{
-                
-                let $ = cheerio.load(res.text)
-
-                // Get table
-                let locate = $('#' + data.id).next().next()
-                
-                // Get all tr in tbody
-                let trs = $(locate).find('tr')
-
-
-                // Loop all tr in tbody
-                trs.each(function (idx, value){
-
-                    $value = $(value).find('td')
-                    let tmpSingle = {}
-                    $value.each(function (idxx, single) {
-                        //console.log($(single).text())
-                        if(idxx == 0) tmpSingle.location = $(single).text()
-                        if(idxx == 1) tmpSingle.number = $(single).text()
-                            
-                    })
-
-                    // Has data
-                    if(tmpSingle['location']){
-                        // Not total or wait to be determined
-                        // No idea why government put a unconfirm data into a confirm data sort by location chart...
-                        if(tmpSingle.location.indexOf("Awaiting confirmation") == -1){
-                            result.push(tmpSingle)
-                        }
-                    }
-
-                })
-
-                // Resolve promise
-                resolve(result)
-
-            }
-
-            
-        })
-
-    })
-}*/
 
 function getScotlandFromNHS(data){
 

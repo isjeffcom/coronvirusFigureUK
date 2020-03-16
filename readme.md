@@ -16,7 +16,7 @@ A live COVID-19 data scraper API provide function with history, and confirmed ca
 
 ## Getting Started
 
-This sourcecode require very basic nodejs skill, or just use the example API.
+This sourcecode require very basic NodeJs skill, or just use the example API.
 
 1. install mysql database > create a 'corona' database > import 'sample.sql'
 2. rename `conf_tmp.js` to `conf.js`, config mysql username and password
