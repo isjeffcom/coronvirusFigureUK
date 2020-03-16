@@ -250,7 +250,7 @@ function getDataFromNHS(data){
                     // Final check and put into database
                     tmp.confirmed = confirmed ? confirmed : -1
                     tmp.negative = negative ? negative : -1
-                    tmp.death = death ? death : -1
+                    //tmp.death = death ? death : -1
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
