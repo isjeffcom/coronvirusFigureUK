@@ -152,14 +152,15 @@ function getDataFromNHS(data){
                 // Process and save to number
                 let confirmed = parseInt(txt[cMIdx[0] - 4].replace(/,/g, ""))
                 let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
-                let death = parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) ? parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) : utils.matchNum(txt[cMIdx[1]-4])
+                //console.log(cMIdx)
+                //let death = parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) ? parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) : utils.matchNum(txt[cMIdx[1]-4])
 
                 // Record if Error and return
-                if(isNaN(confirmed) || isNaN(negative) || isNaN(death)){
+                if(isNaN(confirmed) || isNaN(negative)){
                     let errData = {
                         confirmed: confirmed,
                         negative: negative,
-                        death: death
+                        //death: death
                     }
                     recordError(data.name, "source struct changed", errData)
                     return
@@ -169,7 +170,7 @@ function getDataFromNHS(data){
                     // Final check and put into database
                     tmp.confirmed = confirmed ? confirmed : -1
                     tmp.negative = negative ? negative : -1
-                    tmp.death = death ? death : -1
+                    //tmp.death = death ? death : -1
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
