@@ -377,24 +377,29 @@ async function getLocations(){
 // Update data
 async function updateData(){
 
-  let update = await robot.getData()
+  robot.getData()
 
   setTimeout(async()=>{
-    if(update){
-      let data = await database.current()
-      if(data){
-        fs.writeFile(path.join(__dirname, 'data/data.json'), JSON.stringify(data), ()=>{
-          // Do nothing
-        })
-      }
-      database.autoApprove()
-      // Get newer updated location data
-      getLocations()
-    }
-  }, 5000)
+
+    putData()
+
+    database.autoApprove()
+    // Get newer updated location data
+    getLocations()
+    
+    
+  }, 10000)
   
 }
 
+async function putData(){
+  let data = await database.current()
+  if(data){
+    fs.writeFileSync(path.join(__dirname, 'data/data.json'), JSON.stringify(data), ()=>{
+      // Do nothing
+    })
+  }
+}
 
 // Cache history data into history.json
 async function putHistory(){

@@ -95,6 +95,7 @@ async function history(){
     const result = await db
     .select("*")
     .from("history")
+    .orderby("date asc")
     .queryList()
 
     if(result){
@@ -119,6 +120,7 @@ async function historyFigures(){
         "suspected",
     ])
     .from("history")
+    .orderby("date asc")
     .queryList()
 
     if(result){
@@ -206,13 +208,10 @@ async function autoApprove(){
 
     let confirmed1 = compare(shadow[0].confirmed, current[0].confirmed)
     let death1 = compare(shadow[0].death, current[0].death)
-    let cured1 = compare(shadow[0].cured, current[0].cured)
     let confirmed2 = compare(shadow[1].confirmed, current[1].confirmed)
     let death2 = compare(shadow[1].death, current[1].death)
-    let cured2 = compare(shadow[1].cured, current[1].cured)
 
-
-    if(confirmed1 && confirmed2 && death1 && death2 && cured1 && cured2 && noNull(shadow[0].area)){
+    if(confirmed1 && confirmed2 && death1 && death2 && noNull(shadow[0].area)){
         updateApprove()
         console.log("approved")
     } else {
@@ -230,7 +229,7 @@ function compare(num1, num2){
 
     const notMuch = 70
 
-    if(num1 > num2 && (num1 - num2) < notMuch){
+    if(num1 >= num2 && (num1 - num2) < notMuch){
         return true
     } else {
         return false
@@ -238,9 +237,9 @@ function compare(num1, num2){
 }
 
 function noNull (a) {
-    let d = JSON.parse(a)
-    for(let i=0;i<area.length;i++){
-        if(d.location == "" || d.location == "null" || d.number.length == "" || d.number == "null" || !isNaN(d.number)){
+    let d = JSON.parse(stripSlashes(a))
+    for(let i=0;i<d.length;i++){
+        if(d.location == "" || d.location == "null" || d.number == "" || d.number == "null" || !isNaN(d.number)){
             return false
         }
     }
@@ -277,6 +276,18 @@ async function saveHistory(){
 
 }
 
+async function addHistory(ready){
+    delete ready.id
+    delete ready.england
+    delete ready.scotland
+    delete ready.wales
+    delete ready.nireland
+    const save = await db
+        .insert("history", ready)
+        .execute()
+
+}
+
 async function saveErr(ready){
     const save = await db
         .insert("err", ready)
@@ -302,5 +313,6 @@ module.exports = {
     saveHistory: saveHistory,
     getApproveToken: getApproveToken,
     verifyPin: verifyPin,
-    saveErr: saveErr
+    saveErr: saveErr,
+    addHistory: addHistory
 }

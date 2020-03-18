@@ -85,7 +85,6 @@ const areaData = [
 ]
 
 function getData(){
-    return new Promise(resolve => {
         getDataFromNHS(figure[0])
         getMoreFromNHS(figure[0]) // Get death and 4 nations data
         getDataFromWDM(figure[1])
@@ -95,10 +94,6 @@ function getData(){
         //getScotlandFromNHS(areaData[1])
         //getWales(areaData[3])
         //getNIreland(areaData[2])
-        
-        resolve(true)
-    })
-    
 }
 
 async function getAreaData(){
@@ -150,10 +145,11 @@ function getMoreFromNHS(data){
                 // Readable Stream.
                 readXlsxFile(fs.createReadStream('nation.xlsx')).then((rows) => {
                     if(rows.length > 0){
+                        
                         for(let i=0;i<rows[0].length;i++){
+                            
                             if(rows[0][i] == "TotalUKDeaths"){
                                 ready.death = rows[1][i]
-
                             } 
 
                             else if(rows[0][i] == "EnglandCases"){
@@ -214,7 +210,7 @@ function getDataFromNHS(data){
                 txt = txt.split(" ")
 
                 // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
-                let cMIdx = utils.idIdxsInArr("positive", txt) // return an array with position with word 'positive'
+                let cMIdx = utils.idIdxsInArr("positive.", txt) // return an array with position with word 'positive'
                 let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with negative with word 'negative'
 
                 if(cMIdx != -1 
@@ -224,24 +220,15 @@ function getDataFromNHS(data){
                     && txt.length>0){
 
                     // Process and save to number
-                    let confirmed = parseInt(txt[cMIdx[0] - 4].replace(/,/g, ""))
+                    let confirmed = parseInt(txt[cMIdx[0] - 3].replace(/,/g, ""))
                     let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
-                    let death = 0
-
-                    if(cMIdx.length > 1){
-                        death = parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) ? parseInt(txt[cMIdx[1]-4].replace(/,/g, "")) : utils.matchNum(txt[cMIdx[1]-4])
-                    } else {
-                        recordError(data.source, "no death", txt)
-                    }
-                    
                     
 
                     // Record if Error and return
-                    if(isNaN(confirmed) || isNaN(negative) || isNaN(death)){
+                    if(isNaN(confirmed) || isNaN(negative)){
                         let errData = {
                             confirmed: confirmed,
-                            negative: negative,
-                            death: death
+                            negative: negative
                         }
                         recordError(data.source, "source struct changed", errData)
                         return
@@ -250,7 +237,6 @@ function getDataFromNHS(data){
                     // Final check and put into database
                     tmp.confirmed = confirmed ? confirmed : -1
                     tmp.negative = negative ? negative : -1
-                    //tmp.death = death ? death : -1
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
