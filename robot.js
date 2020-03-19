@@ -57,7 +57,7 @@ const figure = [
     {
         source: "Worldometers",
         link: "https://www.worldometers.info/coronavirus/",
-        id: "main_table_countries"
+        id: "main_table_countries_today"
     }
 ]
 
@@ -142,47 +142,51 @@ function getMoreFromNHS(data){
             if(response.statusCode == 200){
                 response.pipe(file)
 
-                // Readable Stream.
-                readXlsxFile(fs.createReadStream('nation.xlsx')).then((rows) => {
-                    if(rows.length > 0){
-                        
-                        for(let i=0;i<rows[0].length;i++){
-                            
-                            if(rows[0][i] == "TotalUKDeaths"){
-                                ready.death = rows[1][i]
-                            } 
-
-                            else if(rows[0][i] == "EnglandCases"){
-                                ready.england = rows[1][i]
-                            }
-
-                            else if(rows[0][i] == "ScotlandCases"){
-                                ready.scotland = rows[1][i]
-                            }
-
-                            else if(rows[0][i] == "WalesCases"){
-                                ready.wales = rows[1][i]
-                            }
-
-                            else if(rows[0][i] == "NICases"){
-                                ready.nireland = rows[1][i]
-                            }
-                            
-                        }
-
-                        database.update(1, ready)
-                        resolve(true)
-                    } else {
-                        resolve(false)
-                    }
-                    
-                })
-
             } else {
                 resolve(false)
             }
+        }).on('end', ()=>{
+
+            // Call only when pipe ended
+            let f = fs.createReadStream('nation.xlsx')
+            
+            readXlsxFile(f).then((rows) => {
+                if(rows.length > 0){
+                    
+                    for(let i=0;i<rows[0].length;i++){
+                        
+                        if(rows[0][i] == "TotalUKDeaths"){
+                            ready.death = rows[1][i]
+                        } 
+
+                        else if(rows[0][i] == "EnglandCases"){
+                            ready.england = rows[1][i]
+                        }
+
+                        else if(rows[0][i] == "ScotlandCases"){
+                            ready.scotland = rows[1][i]
+                        }
+
+                        else if(rows[0][i] == "WalesCases"){
+                            ready.wales = rows[1][i]
+                        }
+
+                        else if(rows[0][i] == "NICases"){
+                            ready.nireland = rows[1][i]
+                        }
+                        
+                    }
+
+                    database.update(1, ready)
+                    resolve(true)
+                } else {
+                    resolve(false)
+                }
+                
+            })
         }).on('error', err => {
             console.error(err)
+            resolve(false)
         })
 
     })
@@ -265,14 +269,16 @@ function getDataFromWDM(data){
             trs.each(function (idx, value){
                 $value = $(value).find('td');
                 $value.each(function (idxx, single) {
-
+                    //console.log($(single).text())
                     if (0 === idxx) {
+                        
                         if($(single).text().indexOf("UK") != -1){
+                            
                             tmp.confirmed = parseInt($($value[idxx+1]).text().replace(/,/g, ""))
                             tmp.death = parseInt($($value[idxx+3]).text().replace(/,/g, ""))
                             tmp.cured = parseInt($($value[idxx+5]).text().replace(/,/g, "")) 
                             tmp.ts = utils.getTS()
-
+                            
                             // Record if Error and return
                             if(isNaN(tmp.confirmed) || isNaN(tmp.death) || isNaN(tmp.cured)){
                                 let errData = {
@@ -397,23 +403,6 @@ function getWales(data){
                 } else {
                     result = null
                 }
-                /*trs.each(function (idx, value){
-
-                    $value = $(value)
-
-                    let tmpSingle = {}
-
-                    $value.each(function (idxx, single) {
-                        let txt = $(single).text()
-                        if(txt.indexOf('total number of confirmed cases') != -1){
-                            let txtBuff = txt.split(' ')
-                            let txtBuffIndex = txtBuff.indexOf('cases')
-
-                            result = parseInt(txtBuff[txtBuffIndex+4])
-                        }
-                    })
-
-                })*/
 
                 resolve({location: "Wales", number: result})
 

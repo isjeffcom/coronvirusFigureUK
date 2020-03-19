@@ -49,7 +49,7 @@ If you are using this API, please join this discussion board. Keep updated for a
 https://spectrum.chat/covid-19-uk-update
 <br><br>
 WeChat Group:<br>
-<img src="https://i.ibb.co/TgSHxK5/IMG-7184.jpg" width="20%">
+<img src="https://i.ibb.co/crH6LG6/fvb.jpg" width="20%">
 
 ## Data Source
 

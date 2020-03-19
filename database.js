@@ -261,6 +261,10 @@ async function saveHistory(){
         serious: result[0].serious,
         negative: result[0].negative,
         suspected: result[0].suspected,
+        england: result[0].england,
+        scotland: result[0].scotland,
+        wales: result[0].wales,
+        nireland: result[0].nireland,
         area: result[0].area
     }
 

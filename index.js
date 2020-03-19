@@ -28,6 +28,7 @@
  * /update: Manually Update Data for admin
  * /locationupdate: Manually update location cache
  * /historyupdate: Manually update history cache
+ * /cacheupdate: Mannually update data cache
 **/
 
 /** 
@@ -291,6 +292,25 @@ app.get('/locationupdate', async function (req, res) {
     res.send(JSON.stringify({status: true, data: "update started"}))
     return
   }
+})
+
+app.get('/cacheupdate', async function(req,res){
+
+  let token = await database.getApproveToken()
+
+  token = token.data.token
+
+  if(req.query.token != token){
+
+    res.send("not allow")
+    return 
+
+  } else {
+    putData()
+    res.send(JSON.stringify({status: true, data: "update started"}))
+    return
+  }
+  
 })
 
 // Manually update history cache for admin
