@@ -86,9 +86,10 @@ const areaData = [
 
 function getData(){
         getDataFromNHS(figure[0])
-        getMoreFromNHS(figure[0]) // Get death and 4 nations data
+        getMoreFromNHS(figure[0])
         getDataFromWDM(figure[1])
         getAreaData()
+
 
         //getEnglandFromNHS(areaData[0])
         //getScotlandFromNHS(areaData[1])
@@ -140,50 +141,52 @@ function getMoreFromNHS(data){
 
         const request = http.get(data.more, response => {
             if(response.statusCode == 200){
-                response.pipe(file)
+                var pipe = response.pipe(file)
+
+                response.on('end', ()=>{
+                    // Call only when pipe ended
+                    let f = fs.createReadStream('nation.xlsx')
+                    
+                    readXlsxFile(f).then((rows) => {
+                        if(rows.length > 0){
+                            
+                            for(let i=0;i<rows[0].length;i++){
+                                
+                                if(rows[0][i] == "TotalUKDeaths"){
+                                    ready.death = rows[1][i]
+                                    
+                                } 
+
+                                else if(rows[0][i] == "EnglandCases"){
+                                    ready.england = rows[1][i]
+                                }
+
+                                else if(rows[0][i] == "ScotlandCases"){
+                                    ready.scotland = rows[1][i]
+                                }
+
+                                else if(rows[0][i] == "WalesCases"){
+                                    ready.wales = rows[1][i]
+                                }
+
+                                else if(rows[0][i] == "NICases"){
+                                    ready.nireland = rows[1][i]
+                                }
+                                
+                            }
+
+                            database.update(1, ready)
+                            resolve(true)
+                        } else {
+                            resolve(false)
+                        }
+                        
+                    })
+                })
 
             } else {
                 resolve(false)
             }
-        }).on('end', ()=>{
-
-            // Call only when pipe ended
-            let f = fs.createReadStream('nation.xlsx')
-            
-            readXlsxFile(f).then((rows) => {
-                if(rows.length > 0){
-                    
-                    for(let i=0;i<rows[0].length;i++){
-                        
-                        if(rows[0][i] == "TotalUKDeaths"){
-                            ready.death = rows[1][i]
-                        } 
-
-                        else if(rows[0][i] == "EnglandCases"){
-                            ready.england = rows[1][i]
-                        }
-
-                        else if(rows[0][i] == "ScotlandCases"){
-                            ready.scotland = rows[1][i]
-                        }
-
-                        else if(rows[0][i] == "WalesCases"){
-                            ready.wales = rows[1][i]
-                        }
-
-                        else if(rows[0][i] == "NICases"){
-                            ready.nireland = rows[1][i]
-                        }
-                        
-                    }
-
-                    database.update(1, ready)
-                    resolve(true)
-                } else {
-                    resolve(false)
-                }
-                
-            })
         }).on('error', err => {
             console.error(err)
             resolve(false)
