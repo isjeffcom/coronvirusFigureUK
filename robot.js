@@ -75,7 +75,7 @@ const areaData = [
     {
         name: "northernIreland",
         link: "https://www.publichealth.hscni.net/news/covid-19-coronavirus",
-        id: "situation-in-northern-ireland"
+        id: "what-is-the-situation-in-northern-ireland"
     },
     {
         name: "wales",
@@ -432,12 +432,13 @@ function getNIreland(data){
                 let txt = $(trs).text()
                 txt = txt.split(" ")
 
+                
+                
+
                 let txtIndex = txt.indexOf("Ireland")
 
                 // Maybe with ending period, ready for not
-                //txtIndex = txtIndex == -1 ? txt.indexOf("positive.") : txtIndex
                 result = parseInt(txt[txtIndex+2])
-
                 resolve({location: "Northern Ireland", number: result})
 
             }
