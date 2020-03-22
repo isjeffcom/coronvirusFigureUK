@@ -104,8 +104,9 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
-    if(england && scotland && nIreland && wales){
+    
 
+    if(england && scotland && nIreland && wales){
         
         let res = england.concat(scotland)
 
@@ -274,7 +275,7 @@ function getDataFromWDM(data){
             trs.each(function (idx, value){
                 $value = $(value).find('td');
                 $value.each(function (idxx, single) {
-                    //console.log($(single).text())
+
                     if (0 === idxx) {
                         
                         if($(single).text().indexOf("UK") != -1){
