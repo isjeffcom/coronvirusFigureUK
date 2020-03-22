@@ -85,16 +85,17 @@ const areaData = [
 ]
 
 function getData(){
-        getDataFromNHS(figure[0])
-        getMoreFromNHS(figure[0])
-        getDataFromWDM(figure[1])
-        getAreaData()
+
+    getDataFromNHS(figure[0])
+    getMoreFromNHS(figure[0])
+    getDataFromWDM(figure[1])
+    getAreaData()
 
 
-        //getEnglandFromNHS(areaData[0])
-        //getScotlandFromNHS(areaData[1])
-        //getWales(areaData[3])
-        //getNIreland(areaData[2])
+    //getEnglandFromNHS(areaData[0])
+    //getScotlandFromNHS(areaData[1])
+    //getWales(areaData[3])
+    //getNIreland(areaData[2])
 }
 
 async function getAreaData(){
@@ -102,7 +103,6 @@ async function getAreaData(){
     const scotland = await getScotlandFromNHS(areaData[1])
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
-
 
     if(england && scotland && nIreland && wales){
 
@@ -201,6 +201,8 @@ function getDataFromNHS(data){
     superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
 
         var tmp = utils.deepCopy(struct.getStruct())
+        delete tmp.death
+
 
         if (err) {
 
