@@ -85,16 +85,17 @@ const areaData = [
 ]
 
 function getData(){
-        getDataFromNHS(figure[0])
-        getMoreFromNHS(figure[0])
-        getDataFromWDM(figure[1])
-        getAreaData()
+
+    getDataFromNHS(figure[0])
+    getMoreFromNHS(figure[0])
+    getDataFromWDM(figure[1])
+    getAreaData()
 
 
-        //getEnglandFromNHS(areaData[0])
-        //getScotlandFromNHS(areaData[1])
-        //getWales(areaData[3])
-        //getNIreland(areaData[2])
+    //getEnglandFromNHS(areaData[0])
+    //getScotlandFromNHS(areaData[1])
+    //getWales(areaData[3])
+    //getNIreland(areaData[2])
 }
 
 async function getAreaData(){
@@ -103,9 +104,9 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
+    
 
     if(england && scotland && nIreland && wales){
-
         
         let res = england.concat(scotland)
 
@@ -201,6 +202,8 @@ function getDataFromNHS(data){
     superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
 
         var tmp = utils.deepCopy(struct.getStruct())
+        delete tmp.death
+
 
         if (err) {
 
@@ -272,7 +275,7 @@ function getDataFromWDM(data){
             trs.each(function (idx, value){
                 $value = $(value).find('td');
                 $value.each(function (idxx, single) {
-                    //console.log($(single).text())
+
                     if (0 === idxx) {
                         
                         if($(single).text().indexOf("UK") != -1){

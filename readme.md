@@ -6,12 +6,12 @@ A live COVID-19 data scraper API provide function with history, and confirmed ca
 
 ## API LIST
 
-1. Current Figure: https://coronauk.isjeff.com/ 
-2. History: https://coronauk.isjeff.com/historyfigures
-3. Location center: https://coronauk.isjeff.com/locations
+1. Current Figure: http://api.covid19uk.live/ 
+2. History: http://api.covid19uk.live/historyfigures
+3. Location center: http://api.covid19uk.live/locations
 
 (Not Recommented for Front-End Use ↓) <br>
-4. History(with regional data): https://coronauk.isjeff.com/history
+4. History(with regional data): http://api.covid19uk.live/history
 <br>
 
 ## Getting Started
@@ -25,8 +25,7 @@ This sourcecode require very basic NodeJs skill, or just use the example API.
 	`npm i`
 	`npm run dev` or just `node index.js`
 5. project will start at `http://localhost:8003`
-6. Manually insert 2 row to `current` and `current_shadow` table, doesn't really matter what you filled in
-7. you can find all router enterance point in index.js
+6. you can find all router enterance point in index.js
 
 
 ## Importance

@@ -60,7 +60,7 @@ const path = require('path')
 const request = require('./request')
 
 // Components
-const robot = require('./robot.js')
+//const robot = require('./robot.js')
 const utils = require('./utils')
 
 // Express JS
@@ -70,6 +70,11 @@ const app = express()
 
 // Runtime
 const process = require('process')
+
+// Threads
+const { Worker } = require("worker_threads");
+const worker = new Worker('./worker.js');
+
 
 // Conf 
 const conf = require('./conf')
@@ -396,13 +401,16 @@ async function getLocations(){
 // Update data
 async function updateData(){
 
-  robot.getData()
+  // Run on second thread
+  worker.postMessage('work')
 
+  // Put data in 10 sec with or without new data
   setTimeout(async()=>{
 
     putData()
 
     database.autoApprove()
+
     // Get newer updated location data
     getLocations()
     

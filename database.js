@@ -132,7 +132,6 @@ async function historyFigures(){
 
 // Update, default to shadow waiting for approvement
 async function update(sourceId, data){
-    //console.log(data)
 
     const result = await db
     .update("current_shadow", data)
