@@ -1,5 +1,5 @@
 # UK Coronavirus Data API
-<img src="https://i.ibb.co/Jj2H6wT/logoc.png" width="50%">
+<img src="https://i.ibb.co/88y21MH/bbv.png" width="40%">
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
 [Web Example](https://covid19uk.live/ "Web Example") <br>
