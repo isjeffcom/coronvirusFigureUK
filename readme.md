@@ -2,13 +2,13 @@
 <img src="https://i.ibb.co/Jj2H6wT/logoc.png" width="50%">
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-[Web Example](http://covid19uk.live/ "Web Example") <br>
+[Web Example](https://covid19uk.live/ "Web Example") <br>
 
 ## API LIST
 
-1. Current Figure: http://api.covid19uk.live/ 
-2. History: http://api.covid19uk.live/historyfigures
-3. Location center: http://api.covid19uk.live/locations
+1. Current Figure: https://api.covid19uk.live/ 
+2. History: https://api.covid19uk.live/historyfigures
+3. Location center: https://api.covid19uk.live/locations
 
 (Not Recommented for Front-End Use ↓) <br>
 4. History(with regional data): http://api.covid19uk.live/history
