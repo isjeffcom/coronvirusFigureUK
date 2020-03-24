@@ -472,7 +472,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 
 INSERT INTO `user` (`id`, `name`, `psw`, `token`) VALUES
-(1, 'jeff', '6351bf9dce654515bf1ddbd6426dfa97', '7F4A9B93D8F1454F60C3F833AB600098');
+(1, 'jeff', 'aaa', 'aaa');
 
 --
 -- Indexes for dumped tables
