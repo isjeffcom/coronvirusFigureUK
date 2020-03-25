@@ -2,7 +2,10 @@
 <img src="https://i.ibb.co/88y21MH/bbv.png" width="40%">
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-[Web Example](https://covid19uk.live/ "Web Example") <br>
+Global API: https://github.com/isjeffcom/coronavirusDataGlobal
+
+# Visualization
+https://covid19uk.live/
 
 ## API LIST
 
@@ -13,6 +16,15 @@ A live COVID-19 data scraper API provide function with history, and confirmed ca
 (Not Recommented for Front-End Use ↓) <br>
 4. History(with regional data): http://api.covid19uk.live/history
 <br>
+
+Public API has request limit. 
+
+### API USAGE NOTICE
+There are not much access barriers for this public API. The only thing I ask for is: 
+
+PLEASE do not attack or harm this as this is not build for profit, it's for people to obtain and understand information 
+PLEASE be careful when you testing this API in your product as it could be potentially create damage
+PLEASE make sure you have cached data on your side if you are building a 2 customer product as this API is not guaranteed 24/7 stable.
 
 ## Getting Started
 
@@ -48,7 +60,7 @@ If you are using this API, please join this discussion board. Keep updated for a
 https://spectrum.chat/covid-19-uk-update
 <br><br>
 WeChat Group:<br>
-<img src="https://i.ibb.co/crH6LG6/fvb.jpg" width="20%">
+<img src="https://i.ibb.co/WtrbwVY/nn.jpg" width="20%">
 
 ## Data Source
 
