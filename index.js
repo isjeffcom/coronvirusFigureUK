@@ -120,57 +120,60 @@ function onCreate(){
 // Main Data
 app.get('/', (req, res) => {
 
-    let data = fs.readFile(path.join(__dirname, 'data/data.json'), 'utf-8', (err, data)=>{
-      if(err){
-        res.send('an error occur, try again')
-        updateData()
-      } else {
-        res.send(data)
-      }
-      return
-    })
+  const stream = fs.createReadStream(path.join(__dirname, 'data/data.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    updateData()
+    return
+  })
+
+  stream.pipe(res)
     
 })
 
 // Get locations center
 app.get('/locations', (req, res) => {
-  let data = fs.readFile(path.join(__dirname, 'data/locations.json'), 'utf-8', (err, data)=>{
-    if(err){
-      res.send('an error occur, try again')
-      putLocation()
-    } else {
-      res.send(data)
-    }
+
+  const stream = fs.createReadStream(path.join(__dirname, 'data/locations.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    putLocation()
     return
   })
+
+  stream.pipe(res)
 })
 
 
 // Get history data
 app.get('/history', (req, res) => {
-  let data = fs.readFile(path.join(__dirname, 'data/history.json'), 'utf-8', (err, data)=>{
-    if(err){
-      res.send('an error occur, try again')
-      putHistory()
-    } else {
-      res.send(data)
-    }
+  const stream = fs.createReadStream(path.join(__dirname, 'data/history.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    putHistory()
     return
   })
+
+  stream.pipe(res)
+
 })
 
 // Get history (figures only) data
 app.get('/historyfigures', (req, res) => {
+
+  const stream = fs.createReadStream(path.join(__dirname, 'data/history_figures.json'))
   
-  let data = fs.readFile(path.join(__dirname, 'data/history_figures.json'), 'utf-8', (err, data)=>{
-    if(err){
-      res.send('an error occur, try again')
-      putHistoryFigures()
-    } else {
-      res.send(data)
-    }
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    putHistoryFigures()
     return
   })
+
+  stream.pipe(res)
+  
 })
 
 
