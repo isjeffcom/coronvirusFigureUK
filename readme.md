@@ -22,9 +22,9 @@ Public API has request limit.
 ### API USAGE NOTICE
 There are not much access barriers for this public API. The only thing I ask for is: <br>
 
-<b>PLEASE</b> do not attack or harm this as this is not build for profit, it's for people to obtain and understand information<br> 
+<b>PLEASE</b> do not attack or harm the server as this is not build for profit, it's for people to obtain and understand information<br> 
 <b>PLEASE</b> be careful when you testing this API in your product as it could be potentially create damage<br> 
-<b>PLEASE</b> make sure you have cached data on your side if you are building a 2 customer product as this API is not guaranteed 24/7 stable.<br>
+<b>PLEASE</b> make sure you have cached data on your side if you are building a product to customer as this API is not guaranteed 24/7 stable.<br>
 
 ## Getting Started
 
