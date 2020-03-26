@@ -50,9 +50,9 @@ This sourcecode require very basic NodeJs skill, or just use the example API.
 5. If you are using this API, please be make sure data has cache and fault tolerance was considered. This is API is not completely reliable at all time.
 
 # Partnered Projects
-UK API: https://github.com/isjeffcom/coronvirusFigureUK
-Global API: https://github.com/isjeffcom/coronavirusDataGlobal
-ML Prediction: https://github.com/lamharrison/coronavirus-machine-learning
+UK API: https://github.com/isjeffcom/coronvirusFigureUK <br>
+Global API: https://github.com/isjeffcom/coronavirusDataGlobal <br>
+ML Prediction: https://github.com/lamharrison/coronavirus-machine-learning <br>
 
 # Contact
 If you are using this API, please join this discussion board. Keep updated for any significant changes!! <br>
