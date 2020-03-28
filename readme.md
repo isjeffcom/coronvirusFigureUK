@@ -9,6 +9,8 @@ https://covid19uk.live/
 
 ## API LIST
 
+Root URL has changed to `https://api.covid19uk.live`, previous URL no longer accessible.
+
 1. Current Figure: https://api.covid19uk.live/ 
 2. History: https://api.covid19uk.live/historyfigures
 3. Location center: https://api.covid19uk.live/locations

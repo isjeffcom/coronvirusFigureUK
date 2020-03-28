@@ -129,7 +129,6 @@ function getMoreFromNHS(data){
     return new Promise(resolve => {
 
         var ready = {
-            death: 0,
             england: 0,
             scotland: 0,
             wales: 0,
@@ -153,12 +152,12 @@ function getMoreFromNHS(data){
                             
                             for(let i=0;i<rows[0].length;i++){
                                 
-                                if(rows[0][i] == "TotalUKDeaths"){
+                                /*if(rows[0][i] == "TotalUKDeaths"){
                                     ready.death = rows[1][i]
                                     
-                                } 
+                                } */
 
-                                else if(rows[0][i] == "EnglandCases"){
+                                if(rows[0][i] == "EnglandCases"){
                                     ready.england = rows[1][i]
                                 }
 
@@ -202,7 +201,6 @@ function getDataFromNHS(data){
     superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
 
         var tmp = utils.deepCopy(struct.getStruct())
-        delete tmp.death
 
 
         if (err) {
@@ -219,9 +217,13 @@ function getDataFromNHS(data){
                 let txt = next.text()
                 txt = txt.split(" ")
 
+                let txtDeath = $(next).next().text()
+                txtDeath = txtDeath.split(" ")
+
                 // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
                 let cMIdx = utils.idIdxsInArr("positive.", txt) // return an array with position with word 'positive'
                 let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with negative with word 'negative'
+                let dMIdx = utils.idIdxsInArr("patients", txtDeath) // return an array with negative with word 'negative'
 
                 if(cMIdx != -1 
                     && nMIdx != -1 
@@ -232,11 +234,12 @@ function getDataFromNHS(data){
                     // Process and save to number
                     let confirmed = parseInt(txt[cMIdx[0] - 3].replace(/,/g, ""))
                     let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
-                    
+                    let death = parseInt(txtDeath[dMIdx[0] - 1].replace(/,/g, ""))
 
                     // Record if Error and return
                     if(isNaN(confirmed) || isNaN(negative)){
                         let errData = {
+                            death: death,
                             confirmed: confirmed,
                             negative: negative
                         }
@@ -245,8 +248,11 @@ function getDataFromNHS(data){
                     }
 
                     // Final check and put into database
+                    
                     tmp.confirmed = confirmed ? confirmed : -1
                     tmp.negative = negative ? negative : -1
+                    tmp.death = death ? death : -1
+
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
@@ -431,17 +437,15 @@ function getNIreland(data){
             }else{
                 
                 let $ = cheerio.load(res.text)
-                let trs = $('h2#' + data.id).next().next()
+                let trs = $('h2#' + data.id).next().next().next()
                 let txt = $(trs).text()
                 txt = txt.split(" ")
-
-                
-                
 
                 let txtIndex = txt.indexOf("Ireland")
 
                 // Maybe with ending period, ready for not
                 result = parseInt(txt[txtIndex+2])
+                console.log(result)
                 resolve({location: "Northern Ireland", number: result})
 
             }
