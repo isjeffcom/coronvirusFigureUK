@@ -2,8 +2,6 @@
 <img src="https://i.ibb.co/88y21MH/bbv.png" width="40%">
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-Global API: https://github.com/isjeffcom/coronavirusDataGlobal
-
 # Visualization
 https://covid19uk.live/
 
@@ -53,16 +51,20 @@ This sourcecode require very basic NodeJs skill, or just use the example API.
 
 5. If you are using this API, please be make sure data has cache and fault tolerance was considered. This is API is not completely reliable at all time.
 
-## Powered By
-Standard NodeJs + ExpressJs along with superagent, cheerio, axios, node-schedule. Detail is in: package.json. Admin page sourcecode are not available
+# Partnered Projects
+UK API: https://github.com/isjeffcom/coronvirusFigureUK <br>
+Global API: https://github.com/isjeffcom/coronavirusDataGlobal <br>
+ML Prediction: https://github.com/lamharrison/coronavirus-machine-learning <br>
 
-
-## Contact
+# Contact
 If you are using this API, please join this discussion board. Keep updated for any significant changes!! <br>
 https://spectrum.chat/covid-19-uk-update
 <br><br>
 WeChat Group:<br>
 <img src="https://i.ibb.co/WtrbwVY/nn.jpg" width="20%">
+
+https://isjeff.com
+hello@isjeff.com
 
 ## Data Source
 
