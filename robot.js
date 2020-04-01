@@ -104,12 +104,11 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
-    
 
     if(england && scotland && nIreland && wales){
         
         let res = england.concat(scotland)
-
+        
         // Wales and Northern Ireland are as one due to there is no regional data available
         if(wales) res.push(wales)
         if(nIreland) res.push(nIreland)
@@ -222,26 +221,28 @@ function getDataFromNHS(data){
 
                 // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
                 let cMIdx = utils.idIdxsInArr("positive.", txt) // return an array with position with word 'positive'
-                let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with negative with word 'negative'
-                let dMIdx = utils.idIdxsInArr("patients", txtDeath) // return an array with negative with word 'negative'
+                let tMIdx = utils.idIdxsInArr("tested", txt) // return an array with negative with word 'negative'
+                let dMIdx = utils.idIdxsInArr("died", txtDeath) // return an array with negative with word 'negative'
 
                 if(cMIdx != -1 
-                    && nMIdx != -1 
+                    && tMIdx != -1 
                     && cMIdx.length > 0 
-                    && nMIdx.length > 0 
+                    && tMIdx.length > 0 
                     && txt.length>0){
 
                     // Process and save to number
                     let confirmed = parseInt(txt[cMIdx[0] - 3].replace(/,/g, ""))
-                    let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
-                    let death = parseInt(txtDeath[dMIdx[0] - 1].replace(/,/g, ""))
+                    let tested = parseInt(txt[tMIdx[0] - 4].replace(/,/g, ""))
+                    let negative = tested - confirmed
+                    let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
 
                     // Record if Error and return
                     if(isNaN(confirmed) || isNaN(negative)){
                         let errData = {
                             death: death,
                             confirmed: confirmed,
-                            negative: negative
+                            negative: negative,
+                            tested: tested
                         }
                         recordError(data.source, "source struct changed", errData)
                         return
@@ -252,6 +253,7 @@ function getDataFromNHS(data){
                     tmp.confirmed = confirmed ? confirmed : -1
                     tmp.negative = negative ? negative : -1
                     tmp.death = death ? death : -1
+                    tmp.tested = tested ? tested : -1
 
                     tmp.ts = utils.getTS()
 
@@ -333,8 +335,10 @@ function getEnglandFromNHS(data){
                 fs.createReadStream('england_data.csv')
                 .pipe(csv())
                 .on('data', (data) => {
-                    let tmp = {location: data.GSS_NM, number: data.TotalCases}
-                    results.push(tmp)
+                    if(data["TotalCases"] && data["GSS_NM"]){
+                        let tmp = {location: data.GSS_NM, number: data.TotalCases}
+                        results.push(tmp)
+                    }
                 })
                 .on('end', () => {
 
@@ -366,14 +370,23 @@ function getScotlandFromNHS(data){
                 let trs = $('#' + data.id + ' table tbody tr')
                 
                 trs.each(function (idx, value){
+                    
                     $value = $(value).find('td')
                     let tmpSingle = {}
                     $value.each(function (idxx, single) {
-                        if(idxx == 0) tmpSingle.location = $(single).text()
-                        if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
+                        // Ignore first row as gov.scot dont know the first row of an HTML table should use: <th>
+                        if(idx != 0){
+                            if(idxx == 0){
+                                let locText = $(single).text()
+                                tmpSingle.location = locText.replace(/\n/g,'')
+                            } 
+                            if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
+                        }
+                        
                     })
-
-                    result.push(tmpSingle)
+                
+                    if(idx != 0)  result.push(tmpSingle)
+                   
                 })
                 
                 resolve(result)
@@ -445,7 +458,6 @@ function getNIreland(data){
 
                 // Maybe with ending period, ready for not
                 result = parseInt(txt[txtIndex+2])
-                console.log(result)
                 resolve({location: "Northern Ireland", number: result})
 
             }
