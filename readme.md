@@ -60,6 +60,7 @@ ML Prediction: https://github.com/lamharrison/coronavirus-machine-learning <br>
 Store stock: <br>
 https://github.com/commmathree/UKSupermarketScrapper <br>
 https://github.com/isjeffcom/UK-All-Store <br>
+<br>
 
 
 # Contact
@@ -71,6 +72,13 @@ WeChat Group:<br>
 
 https://isjeff.com
 hello@isjeff.com
+
+### Co-work with:
+@Big Tree: https://github.com/lamharrison <br>
+@Jimmy Lu: https://github.com/lujiammy <br>
+@Vincent: https://github.com/VincentNevermore <br>
+@commathree: https://github.com/commmathree <br>
+
 
 ## Data Source
 
