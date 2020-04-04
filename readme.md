@@ -54,7 +54,13 @@ This sourcecode require very basic NodeJs skill, or just use the example API.
 # Partnered Projects
 UK API: https://github.com/isjeffcom/coronvirusFigureUK <br>
 Global API: https://github.com/isjeffcom/coronavirusDataGlobal <br>
+<br>
 ML Prediction: https://github.com/lamharrison/coronavirus-machine-learning <br>
+<br>
+Store stock: <br>
+https://github.com/commmathree/UKSupermarketScrapper <br>
+https://github.com/isjeffcom/UK-All-Store <br>
+
 
 # Contact
 If you are using this API, please join this discussion board. Keep updated for any significant changes!! <br>

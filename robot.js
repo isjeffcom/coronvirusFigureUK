@@ -52,7 +52,7 @@ const figure = [
         source: "NHS",
         link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public",
         more: "http://www.arcgis.com/sharing/rest/content/items/bc8ee90225644ef7a6f4dd1b13ea1d67/data",
-        id: "number-of-cases"
+        id: "number-of-cases-and-deaths"
     },
     {
         source: "Worldometers",
@@ -90,12 +90,6 @@ function getData(){
     getMoreFromNHS(figure[0])
     getDataFromWDM(figure[1])
     getAreaData()
-
-
-    //getEnglandFromNHS(areaData[0])
-    //getScotlandFromNHS(areaData[1])
-    //getWales(areaData[3])
-    //getNIreland(areaData[2])
 }
 
 async function getAreaData(){
@@ -232,6 +226,7 @@ function getDataFromNHS(data){
 
                     // Process and save to number
                     let confirmed = parseInt(txt[cMIdx[0] - 3].replace(/,/g, ""))
+                    
                     let tested = parseInt(txt[tMIdx[0] - 4].replace(/,/g, ""))
                     let negative = tested - confirmed
                     let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
@@ -268,6 +263,7 @@ function getDataFromNHS(data){
     })
 }
 
+// Get data from worldometers
 function getDataFromWDM(data){
 
     var tmp = utils.deepCopy(struct.getStruct())
@@ -291,6 +287,7 @@ function getDataFromWDM(data){
                             tmp.confirmed = parseInt($($value[idxx+1]).text().replace(/,/g, ""))
                             tmp.death = parseInt($($value[idxx+3]).text().replace(/,/g, ""))
                             tmp.cured = parseInt($($value[idxx+5]).text().replace(/,/g, "")) 
+                            tmp.serious = parseInt($($value[idxx+7]).text().replace(/,/g, "")) 
                             tmp.ts = utils.getTS()
                             
                             // Record if Error and return
@@ -299,6 +296,7 @@ function getDataFromWDM(data){
                                     confirmed: tmp.confirmed,
                                     death: tmp.death,
                                     cured: tmp.cured,
+                                    serious: tmp.serious
                                 }
                                 recordError(data.source, "source struct changed", errData)
                                 return
@@ -403,9 +401,11 @@ function getScotlandFromNHS(data){
 // Only return wales number only
 function getWales(data){
 
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
+        let wales = await database.getWales()
+        resolve({location: "Wales", number: wales.wales})
 
-        var result = 0
+        /*var result = 0
 
         superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
@@ -432,7 +432,7 @@ function getWales(data){
                 resolve({location: "Wales", number: result})
 
             }
-        })
+        })*/
 
     })
 }
