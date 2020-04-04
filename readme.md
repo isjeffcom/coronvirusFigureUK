@@ -76,7 +76,7 @@ hello@isjeff.com
 ### Co-work with:
 @Big Tree: https://github.com/lamharrison <br>
 @Jimmy Lu: https://github.com/lujiammy <br>
-@Vincent: https://github.com/VincentNevermore <br>
+@Vincent Zhang: https://github.com/VincentNevermore <br>
 @commathree: https://github.com/commmathree <br>
 
 
