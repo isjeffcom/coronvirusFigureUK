@@ -194,6 +194,15 @@ async function updateApprove(){
     return { status: true, data: null, err: null}
 }
 
+async function getWales(){
+    const shadow = await db
+    .select("wales")
+    .from("current_shadow")
+    .queryRow()
+
+    return shadow
+}
+
 async function autoApprove(){
     const shadow = await db
     .select("*")
@@ -317,5 +326,6 @@ module.exports = {
     getApproveToken: getApproveToken,
     verifyPin: verifyPin,
     saveErr: saveErr,
-    addHistory: addHistory
+    addHistory: addHistory,
+    getWales: getWales
 }

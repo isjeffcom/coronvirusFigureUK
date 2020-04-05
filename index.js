@@ -45,7 +45,6 @@
  * put+xx: cache location to /data/xx.json
 **/
 
-
 // IMPORT LIST
 // Database 
 const database = require('./database')
@@ -119,65 +118,68 @@ function onCreate(){
 }
 
 // Main Data
-app.get('/', async function (req, res) {
+app.get('/', (req, res) => {
 
-    let data = fs.readFile(path.join(__dirname, 'data/data.json'), 'utf-8', (err, data)=>{
-      if(err){
-        res.send('an error occur, try again')
-        updateData()
-      } else {
-        res.send(data)
-      }
-      return
-    })
+  const stream = fs.createReadStream(path.join(__dirname, 'data/data.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    updateData()
+    return
+  })
+
+  stream.pipe(res)
     
 })
 
 // Get locations center
-app.get('/locations', async function (req, res) {
-  let data = fs.readFile(path.join(__dirname, 'data/locations.json'), 'utf-8', (err, data)=>{
-    if(err){
-      res.send('an error occur, try again')
-      putLocation()
-    } else {
-      res.send(data)
-    }
+app.get('/locations', (req, res) => {
+
+  const stream = fs.createReadStream(path.join(__dirname, 'data/locations.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    putLocation()
     return
   })
+
+  stream.pipe(res)
 })
 
 
 // Get history data
-app.get('/history', async function (req, res) {
-  let data = fs.readFile(path.join(__dirname, 'data/history.json'), 'utf-8', (err, data)=>{
-    if(err){
-      res.send('an error occur, try again')
-      putHistory()
-    } else {
-      res.send(data)
-    }
+app.get('/history', (req, res) => {
+  const stream = fs.createReadStream(path.join(__dirname, 'data/history.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    putHistory()
     return
   })
+
+  stream.pipe(res)
+
 })
 
 // Get history (figures only) data
-app.get('/historyfigures', async function (req, res) {
+app.get('/historyfigures', (req, res) => {
+
+  const stream = fs.createReadStream(path.join(__dirname, 'data/history_figures.json'))
   
-  let data = fs.readFile(path.join(__dirname, 'data/history_figures.json'), 'utf-8', (err, data)=>{
-    if(err){
-      res.send('an error occur, try again')
-      putHistoryFigures()
-    } else {
-      res.send(data)
-    }
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    putHistoryFigures()
     return
   })
+
+  stream.pipe(res)
+  
 })
 
 
 
 // Go to visual
-app.get('/visual', async function (req, res) {
+app.get('/visual', (req, res) => {
   //res.sendFile(path.join(__dirname, 'visual/index.html'))
   res.redirect("https://covid19uk.live");
   return;
@@ -186,7 +188,7 @@ app.get('/visual', async function (req, res) {
 
 // FOR ADMIN FUNCTIONS
 // Admin login
-app.get('/admin', async function (req, res){
+app.get('/admin', async (req, res)=>{
   
   if(req.query.pin && req.query.token){
     let q = await database.verifyPin(req.query.pin, req.query.token)
@@ -202,7 +204,7 @@ app.get('/admin', async function (req, res){
 })
 
 // Get both current and current_shadow for admin
-app.get('/all', async function (req, res) {
+app.get('/all', async (req, res) => {
 
 
   if(!req.query.token){
@@ -242,7 +244,7 @@ app.get('/all', async function (req, res) {
 })
 
 // Approve shadow data become official data
-app.get('/approve', async function (req, res) {
+app.get('/approve', async (req, res) => {
 
   let token = await database.getApproveToken()
 
@@ -262,7 +264,7 @@ app.get('/approve', async function (req, res) {
 })
 
 // Manually Update Data for admin
-app.get('/update', async function (req, res) {
+app.get('/update', async (req, res) => {
 
   let token = await database.getApproveToken()
 
@@ -281,7 +283,7 @@ app.get('/update', async function (req, res) {
 })
 
 // Manually update location cache for admin
-app.get('/locationupdate', async function (req, res) {
+app.get('/locationupdate', async (req, res) => {
 
   let token = await database.getApproveToken()
 
@@ -299,7 +301,7 @@ app.get('/locationupdate', async function (req, res) {
   }
 })
 
-app.get('/cacheupdate', async function(req,res){
+app.get('/cacheupdate', async (req,res) => {
 
   let token = await database.getApproveToken()
 
@@ -319,7 +321,7 @@ app.get('/cacheupdate', async function(req,res){
 })
 
 // Manually update history cache for admin
-app.get('/historyupdate', async function (req, res) {
+app.get('/historyupdate', async (req, res) => {
 
   let token = await database.getApproveToken()
 
@@ -347,7 +349,7 @@ var updateAll = schedule.scheduleJob('updateall', '01 * * * *', 'Europe/London',
   return
 })
 
-var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/London', async function(){
+var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/London', async () => {
   let save = await database.saveHistory()
   if(save){
     putHistory()

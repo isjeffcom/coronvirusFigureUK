@@ -52,7 +52,7 @@ const figure = [
         source: "NHS",
         link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public",
         more: "http://www.arcgis.com/sharing/rest/content/items/bc8ee90225644ef7a6f4dd1b13ea1d67/data",
-        id: "number-of-cases"
+        id: "number-of-cases-and-deaths"
     },
     {
         source: "Worldometers",
@@ -90,12 +90,6 @@ function getData(){
     getMoreFromNHS(figure[0])
     getDataFromWDM(figure[1])
     getAreaData()
-
-
-    //getEnglandFromNHS(areaData[0])
-    //getScotlandFromNHS(areaData[1])
-    //getWales(areaData[3])
-    //getNIreland(areaData[2])
 }
 
 async function getAreaData(){
@@ -104,12 +98,11 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
-    
 
     if(england && scotland && nIreland && wales){
         
         let res = england.concat(scotland)
-
+        
         // Wales and Northern Ireland are as one due to there is no regional data available
         if(wales) res.push(wales)
         if(nIreland) res.push(nIreland)
@@ -129,7 +122,6 @@ function getMoreFromNHS(data){
     return new Promise(resolve => {
 
         var ready = {
-            death: 0,
             england: 0,
             scotland: 0,
             wales: 0,
@@ -153,12 +145,12 @@ function getMoreFromNHS(data){
                             
                             for(let i=0;i<rows[0].length;i++){
                                 
-                                if(rows[0][i] == "TotalUKDeaths"){
+                                /*if(rows[0][i] == "TotalUKDeaths"){
                                     ready.death = rows[1][i]
                                     
-                                } 
+                                } */
 
-                                else if(rows[0][i] == "EnglandCases"){
+                                if(rows[0][i] == "EnglandCases"){
                                     ready.england = rows[1][i]
                                 }
 
@@ -202,7 +194,6 @@ function getDataFromNHS(data){
     superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
 
         var tmp = utils.deepCopy(struct.getStruct())
-        delete tmp.death
 
 
         if (err) {
@@ -219,34 +210,46 @@ function getDataFromNHS(data){
                 let txt = next.text()
                 txt = txt.split(" ")
 
+                let txtDeath = $(next).next().text()
+                txtDeath = txtDeath.split(" ")
+
                 // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
                 let cMIdx = utils.idIdxsInArr("positive.", txt) // return an array with position with word 'positive'
-                let nMIdx = utils.idIdxsInArr("negative", txt) // return an array with negative with word 'negative'
+                let tMIdx = utils.idIdxsInArr("tested", txt) // return an array with negative with word 'negative'
+                let dMIdx = utils.idIdxsInArr("died", txtDeath) // return an array with negative with word 'negative'
 
                 if(cMIdx != -1 
-                    && nMIdx != -1 
+                    && tMIdx != -1 
                     && cMIdx.length > 0 
-                    && nMIdx.length > 0 
+                    && tMIdx.length > 0 
                     && txt.length>0){
 
                     // Process and save to number
                     let confirmed = parseInt(txt[cMIdx[0] - 3].replace(/,/g, ""))
-                    let negative = parseInt(txt[nMIdx[0] - 3].replace(/,/g, ""))
                     
+                    let tested = parseInt(txt[tMIdx[0] - 4].replace(/,/g, ""))
+                    let negative = tested - confirmed
+                    let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
 
                     // Record if Error and return
                     if(isNaN(confirmed) || isNaN(negative)){
                         let errData = {
+                            death: death,
                             confirmed: confirmed,
-                            negative: negative
+                            negative: negative,
+                            tested: tested
                         }
                         recordError(data.source, "source struct changed", errData)
                         return
                     }
 
                     // Final check and put into database
+                    
                     tmp.confirmed = confirmed ? confirmed : -1
                     tmp.negative = negative ? negative : -1
+                    tmp.death = death ? death : -1
+                    tmp.tested = tested ? tested : -1
+
                     tmp.ts = utils.getTS()
 
                     database.update(1, tmp)
@@ -260,6 +263,7 @@ function getDataFromNHS(data){
     })
 }
 
+// Get data from worldometers
 function getDataFromWDM(data){
 
     var tmp = utils.deepCopy(struct.getStruct())
@@ -283,6 +287,7 @@ function getDataFromWDM(data){
                             tmp.confirmed = parseInt($($value[idxx+1]).text().replace(/,/g, ""))
                             tmp.death = parseInt($($value[idxx+3]).text().replace(/,/g, ""))
                             tmp.cured = parseInt($($value[idxx+5]).text().replace(/,/g, "")) 
+                            tmp.serious = parseInt($($value[idxx+7]).text().replace(/,/g, "")) 
                             tmp.ts = utils.getTS()
                             
                             // Record if Error and return
@@ -291,6 +296,7 @@ function getDataFromWDM(data){
                                     confirmed: tmp.confirmed,
                                     death: tmp.death,
                                     cured: tmp.cured,
+                                    serious: tmp.serious
                                 }
                                 recordError(data.source, "source struct changed", errData)
                                 return
@@ -327,8 +333,10 @@ function getEnglandFromNHS(data){
                 fs.createReadStream('england_data.csv')
                 .pipe(csv())
                 .on('data', (data) => {
-                    let tmp = {location: data.GSS_NM, number: data.TotalCases}
-                    results.push(tmp)
+                    if(data["TotalCases"] && data["GSS_NM"]){
+                        let tmp = {location: data.GSS_NM, number: data.TotalCases}
+                        results.push(tmp)
+                    }
                 })
                 .on('end', () => {
 
@@ -360,14 +368,23 @@ function getScotlandFromNHS(data){
                 let trs = $('#' + data.id + ' table tbody tr')
                 
                 trs.each(function (idx, value){
+                    
                     $value = $(value).find('td')
                     let tmpSingle = {}
                     $value.each(function (idxx, single) {
-                        if(idxx == 0) tmpSingle.location = $(single).text()
-                        if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
+                        // Ignore first row as gov.scot dont know the first row of an HTML table should use: <th>
+                        if(idx != 0){
+                            if(idxx == 0){
+                                let locText = $(single).text()
+                                tmpSingle.location = locText.replace(/\n/g,'')
+                            } 
+                            if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
+                        }
+                        
                     })
-
-                    result.push(tmpSingle)
+                
+                    if(idx != 0)  result.push(tmpSingle)
+                   
                 })
                 
                 resolve(result)
@@ -384,9 +401,11 @@ function getScotlandFromNHS(data){
 // Only return wales number only
 function getWales(data){
 
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
+        let wales = await database.getWales()
+        resolve({location: "Wales", number: wales.wales})
 
-        var result = 0
+        /*var result = 0
 
         superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
@@ -413,7 +432,7 @@ function getWales(data){
                 resolve({location: "Wales", number: result})
 
             }
-        })
+        })*/
 
     })
 }
@@ -431,12 +450,9 @@ function getNIreland(data){
             }else{
                 
                 let $ = cheerio.load(res.text)
-                let trs = $('h2#' + data.id).next().next()
+                let trs = $('h2#' + data.id).next().next().next()
                 let txt = $(trs).text()
                 txt = txt.split(" ")
-
-                
-                
 
                 let txtIndex = txt.indexOf("Ireland")
 

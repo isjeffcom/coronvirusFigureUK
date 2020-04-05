@@ -1,18 +1,30 @@
 # UK Coronavirus Data API
-<img src="https://i.ibb.co/Jj2H6wT/logoc.png" width="50%">
+<img src="https://i.ibb.co/88y21MH/bbv.png" width="40%">
 A live COVID-19 data scraper API provide function with history, and confirmed cases geolocation
 
-[Web Example](http://covid19uk.live/ "Web Example") <br>
+# Visualization
+https://covid19uk.live/
 
 ## API LIST
 
-1. Current Figure: https://coronauk.isjeff.com/ 
-2. History: https://coronauk.isjeff.com/historyfigures
-3. Location center: https://coronauk.isjeff.com/locations
+Root URL has changed to `https://api.covid19uk.live`, previous URL no longer accessible.
+
+1. Current Figure: https://api.covid19uk.live/ 
+2. History: https://api.covid19uk.live/historyfigures
+3. Location center: https://api.covid19uk.live/locations
 
 (Not Recommented for Front-End Use ↓) <br>
-4. History(with regional data): https://coronauk.isjeff.com/history
+4. History(with regional data): http://api.covid19uk.live/history
 <br>
+
+Public API has request limit. 
+
+### API USAGE NOTICE
+There are not much access barriers for this public API. The only thing I ask for is: <br>
+
+<b>PLEASE</b> do not attack or harm the server as this is not build for profit, it's for people to obtain and understand information<br> 
+<b>PLEASE</b> be careful when you testing this API in your product as it could be potentially create damage<br> 
+<b>PLEASE</b> make sure you have cached data on your side if you are building a product to customer as this API is not guaranteed 24/7 stable.<br>
 
 ## Getting Started
 
@@ -25,8 +37,7 @@ This sourcecode require very basic NodeJs skill, or just use the example API.
 	`npm i`
 	`npm run dev` or just `node index.js`
 5. project will start at `http://localhost:8003`
-6. Manually insert 2 row to `current` and `current_shadow` table, doesn't really matter what you filled in
-7. you can find all router enterance point in index.js
+6. you can find all router enterance point in index.js
 
 
 ## Importance
@@ -40,16 +51,34 @@ This sourcecode require very basic NodeJs skill, or just use the example API.
 
 5. If you are using this API, please be make sure data has cache and fault tolerance was considered. This is API is not completely reliable at all time.
 
-## Powered By
-Standard NodeJs + ExpressJs along with superagent, cheerio, axios, node-schedule. Detail is in: package.json. Admin page sourcecode are not available
+# Partnered Projects
+UK API: https://github.com/isjeffcom/coronvirusFigureUK <br>
+Global API: https://github.com/isjeffcom/coronavirusDataGlobal <br>
+<br>
+ML Prediction: https://github.com/lamharrison/coronavirus-machine-learning <br>
+<br>
+Store stock: <br>
+https://github.com/commmathree/UKSupermarketScrapper <br>
+https://github.com/isjeffcom/UK-All-Store <br>
+<br>
 
 
-## Contact
+# Contact
 If you are using this API, please join this discussion board. Keep updated for any significant changes!! <br>
 https://spectrum.chat/covid-19-uk-update
 <br><br>
 WeChat Group:<br>
 <img src="https://i.ibb.co/b33pNtS/IMG-7935.jpg" width="20%">
+
+https://isjeff.com
+hello@isjeff.com
+
+### Co-work with:
+@Big Tree: https://github.com/lamharrison <br>
+@Jimmy Lu: https://github.com/lujiammy <br>
+@Vincent Zhang: https://github.com/VincentNevermore <br>
+@commathree: https://github.com/commmathree <br>
+
 
 ## Data Source
 
