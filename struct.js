@@ -7,6 +7,8 @@ function getStruct () {
         serious: 0,
         negative: 0,
         suspected: 0,
+        tested: 0,
+        test_done: 0,
         area: "",
         ts: 0
     }

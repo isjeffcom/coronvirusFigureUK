@@ -219,6 +219,12 @@ async function autoApprove(){
     let confirmed2 = compare(shadow[1].confirmed, current[1].confirmed)
     let death2 = compare(shadow[1].death, current[1].death)
 
+    if(!shadow[0].area){
+        console.log("no area")
+        saveErr({source: "approve", reason: "no area data", detail: "none"})
+        return
+    }
+
     if(confirmed1 && confirmed2 && death1 && death2 && noNull(shadow[0].area)){
         updateApprove()
         console.log("approved")
@@ -269,6 +275,8 @@ async function saveHistory(){
         serious: result[0].serious,
         negative: result[0].negative,
         suspected: result[0].suspected,
+        tested: result[0].tested,
+        test_done: result[0].test_done,
         england: result[0].england,
         scotland: result[0].scotland,
         wales: result[0].wales,

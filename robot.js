@@ -111,7 +111,6 @@ async function getAreaData(){
             area: addSlashes(JSON.stringify(res))
         }
 
-
         if(ready.area != "" || ready.area.length > 0){
             database.update(1, ready)
         }
@@ -206,28 +205,34 @@ function getDataFromNHS(data){
             let $ = cheerio.load(res.text)
 
             $(('h2#'+data.id)).each((idx, ele) => {
-                let next = $(ele).next()
-                let txt = next.text()
-                txt = txt.split(" ")
 
-                let txtDeath = $(next).next().text()
+                let testReady = $(ele).next()
+                let testTxt = testReady.text()
+                testTxt = testTxt.split(" ")
+
+                let posiReady = $(ele).next().next()
+                let posiTxt = posiReady.text()
+                posiTxt = posiTxt.split(" ")
+
+                let txtDeath = $(posiReady).next().text()
                 txtDeath = txtDeath.split(" ")
 
                 // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
-                let cMIdx = utils.idIdxsInArr("positive.", txt) // return an array with position with word 'positive'
-                let tMIdx = utils.idIdxsInArr("tested", txt) // return an array with negative with word 'negative'
+                let teMIdx = utils.idIdxsInArr("tests", testTxt) // return an array with position with word 'positive'
+                let cMIdx = utils.idIdxsInArr("positive.", posiTxt) // return an array with position with word 'positive'
+                let tMIdx = utils.idIdxsInArr("tested", posiTxt) // return an array with negative with word 'negative'
                 let dMIdx = utils.idIdxsInArr("died", txtDeath) // return an array with negative with word 'negative'
 
                 if(cMIdx != -1 
                     && tMIdx != -1 
                     && cMIdx.length > 0 
                     && tMIdx.length > 0 
-                    && txt.length>0){
+                    && posiTxt.length>0){
 
                     // Process and save to number
-                    let confirmed = parseInt(txt[cMIdx[0] - 3].replace(/,/g, ""))
-                    
-                    let tested = parseInt(txt[tMIdx[0] - 4].replace(/,/g, ""))
+                    let testedDone = parseInt(testTxt[teMIdx[0] - 1].replace(/,/g, ""))
+                    let confirmed = parseInt(posiTxt[cMIdx[0] - 2].replace(/,/g, ""))
+                    let tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
                     let negative = tested - confirmed
                     let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
 
@@ -237,7 +242,8 @@ function getDataFromNHS(data){
                             death: death,
                             confirmed: confirmed,
                             negative: negative,
-                            tested: tested
+                            tested: tested,
+                            tested_done: testedDone
                         }
                         recordError(data.source, "source struct changed", errData)
                         return
@@ -249,6 +255,7 @@ function getDataFromNHS(data){
                     tmp.negative = negative ? negative : -1
                     tmp.death = death ? death : -1
                     tmp.tested = tested ? tested : -1
+                    tmp.test_done = testedDone ? testedDone : -1
 
                     tmp.ts = utils.getTS()
 
