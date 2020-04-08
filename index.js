@@ -146,6 +146,19 @@ app.get('/locations', (req, res) => {
   stream.pipe(res)
 })
 
+// Get locations center
+app.get('/timeline', (req, res) => {
+
+  const stream = fs.createReadStream(path.join(__dirname, 'data/timeline.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    return
+  })
+
+  stream.pipe(res)
+})
+
 
 // Get history data
 app.get('/history', (req, res) => {
@@ -378,6 +391,7 @@ async function getLocations(){
         let loca = encodeURI(el.location)
         
         await request.genGet(mapboxAPI+ loca +".json", [{name: "access_token", val: mapboxToken}], (res)=>{
+          
           if(res.status){
             let center = res.data.features[0].center
             
@@ -410,9 +424,11 @@ async function updateData(){
   // Put data in 10 sec with or without new data
   setTimeout(async()=>{
 
-    putData()
+    
 
     database.autoApprove()
+
+    putData()
 
     // Get newer updated location data
     getLocations()

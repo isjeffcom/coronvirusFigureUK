@@ -35,7 +35,10 @@ const utils = require('./utils')
 const database = require('./database')
 const { addSlashes } = require('slashes')
 const csv = require('csv-parser')
-const fs = require('fs');
+
+// File System
+const fs = require('fs')
+const path = require('path')
 
 const { http, https } = require('follow-redirects');
 
@@ -61,6 +64,8 @@ const figure = [
     }
 ]
 
+const tlData = { link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public", id: "full-history" }
+
 const areaData = [
     {
         name: "england",
@@ -69,8 +74,8 @@ const areaData = [
     },
     {
         name: "scotland",
-        link: "https://www.gov.scot/coronavirus-covid-19/",
-        id: "overview"
+        link: "https://www.gov.scot/publications/coronavirus-covid-19-tests-and-cases-in-scotland/",
+        id: "preamble"
     },
     {
         name: "northernIreland",
@@ -90,6 +95,7 @@ function getData(){
     getMoreFromNHS(figure[0])
     getDataFromWDM(figure[1])
     getAreaData()
+    getTimeline(tlData)
 }
 
 async function getAreaData(){
@@ -372,7 +378,9 @@ function getScotlandFromNHS(data){
             }else{
                 
                 let $ = cheerio.load(res.text)
-                let trs = $('#' + data.id + ' table tbody tr')
+                let tables = $('#' + data.id + ' table')
+                let trs = $(tables[0]).find('tbody tr')
+                //let trs = $('#' + data.id + ' table tbody tr')
                 
                 trs.each(function (idx, value){
                     
@@ -384,6 +392,7 @@ function getScotlandFromNHS(data){
                             if(idxx == 0){
                                 let locText = $(single).text()
                                 tmpSingle.location = locText.replace(/\n/g,'')
+                                
                             } 
                             if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
                         }
@@ -496,6 +505,47 @@ function recordError(source, reason, data){
         // dont stop main thread
     }
 
+}
+
+function getTimeline(data){
+    superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
+
+
+        if (err) {
+
+            //recordError("timeline", "timeout", err)
+            return
+
+        } else {
+
+            let allRes = {timeline: []}
+
+            let $ = cheerio.load(res.text)
+
+            $(('div#'+data.id)).each((idx, ele) => {
+
+                let all = $(ele).find("li")
+                if(all && all.length > 99){
+                    for(let i=0;i<all.length;i++){
+                        let el = all[i]
+                        let s = $(el).find("time").attr("datetime")
+                        allRes.timeline.push(s)
+                    }
+    
+                    if(allRes.timeline.length > 99){
+                        fs.writeFileSync(path.join(__dirname, 'data/timeline.json'), JSON.stringify(allRes), ()=>{
+                            // Do nothing
+                        })
+                    }
+                }
+                
+            })
+
+            
+            
+
+        }
+    })
 }
 
 
