@@ -391,10 +391,21 @@ function getScotlandFromNHS(data){
                         if(idx != 0){
                             if(idxx == 0){
                                 let locText = $(single).text()
-                                tmpSingle.location = locText.replace(/\n/g,'')
                                 
+                                tmpSingle.location = locText.replace(/\n/g,'')
                             } 
-                            if(idxx == 1) tmpSingle.number = parseInt($(single).text().replace(/,/g, ""))
+
+                            if(idxx == 1) {
+                                let tx = $(single).text().replace(/,/g, "")
+
+                                // Some are *
+                                if(isNaN(tx)){
+                                    tmpSingle.number = 0
+                                } else {
+                                    tmpSingle.number = parseInt(tx)
+                                }
+                                
+                            }
                         }
                         
                     })
@@ -526,6 +537,9 @@ function getTimeline(data){
 
                 let all = $(ele).find("li")
                 if(all && all.length > 99){
+
+                    let last
+
                     for(let i=0;i<all.length;i++){
                         let el = all[i]
                         let s = $(el).find("time").attr("datetime")
