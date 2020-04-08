@@ -12,9 +12,10 @@ Root URL has changed to `https://api.covid19uk.live`, previous URL no longer acc
 1. Current Figure: https://api.covid19uk.live/ 
 2. History: https://api.covid19uk.live/historyfigures
 3. Location center: https://api.covid19uk.live/locations
+4. Gov.uk Update time daily: https://api.covid19uk.live/timeline
 
 (Not Recommented for Front-End Use ↓) <br>
-4. History(with regional data): http://api.covid19uk.live/history
+5. Full History(with regional data): http://api.covid19uk.live/history
 <br>
 
 Public API has request limit. 
@@ -60,7 +61,10 @@ ML Prediction: https://github.com/lamharrison/coronavirus-machine-learning <br>
 Store stock: <br>
 https://github.com/commmathree/UKSupermarketScrapper <br>
 https://github.com/isjeffcom/UK-All-Store <br>
-<br>
+<br><br>
+
+New Zealand Version (By @Larry):<br>
+https://covid19nz.live
 
 
 # Contact
