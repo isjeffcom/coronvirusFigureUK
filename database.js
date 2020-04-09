@@ -241,7 +241,7 @@ function compare(num1, num2){
         return false
     }
 
-    const notMuch = 70
+    const notMuch = 20
 
     if(num1 >= num2 && (num1 - num2) < notMuch){
         return true
