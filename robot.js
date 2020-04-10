@@ -347,7 +347,12 @@ function getEnglandFromNHS(data){
                 .pipe(csv())
                 .on('data', (data) => {
                     if(data["TotalCases"] && data["GSS_NM"]){
-                        let tmp = {location: data.GSS_NM, number: data.TotalCases}
+                        let num = data.TotalCases
+                        if(!num && isNaN(num)){
+                            num = 0 
+                        }
+                        num = num.replace(/,/g, "")
+                        let tmp = {location: data.GSS_NM, number: parseInt(num)}
                         results.push(tmp)
                     }
                 })
