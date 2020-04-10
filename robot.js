@@ -404,10 +404,15 @@ function getScotlandFromNHS(data){
                                 let tx = $(single).text().replace(/,/g, "")
 
                                 // Some are *
-                                if(isNaN(tx)){
+                                if(!tx || isNaN(tx)){
                                     tmpSingle.number = 0
                                 } else {
                                     tmpSingle.number = parseInt(tx)
+                                }
+                                
+                                // Some might completely none
+                                if(isNaN(tmpSingle.number)){
+                                    tmpSingle.number = 0
                                 }
                                 
                             }
