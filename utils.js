@@ -71,6 +71,11 @@ function isJson(str) {
     return true;
 }
 
+// Remove all front and back space
+function removeFBSpace(str){ 
+    return str.replace(/(^\s*)|(\s*$)/g, ""); 
+}
+
 
 module.exports = {
     deepCopy: deepCopy,
@@ -78,5 +83,6 @@ module.exports = {
     idIdxsInArr: idIdxsInArr,
     idIdxsInArrWithId: idIdxsInArrWithId,
     matchNum: matchNum,
-    isJson: isJson
+    isJson: isJson,
+    removeFBSpace: removeFBSpace
 }

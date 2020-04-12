@@ -252,6 +252,7 @@ function getDataFromNHS(data){
                             tested_done: testedDone
                         }
                         recordError(data.source, "source struct changed", errData)
+                        //console.log(errData)
                         return
                     }
 
@@ -398,6 +399,9 @@ function getScotlandFromNHS(data){
                                 let locText = $(single).text()
                                 
                                 tmpSingle.location = locText.replace(/\n/g,'')
+
+                                // Remove both front and back space
+                                tmpSingle.location = utils.removeFBSpace(tmpSingle.location)
                             } 
 
                             if(idxx == 1) {
@@ -421,6 +425,7 @@ function getScotlandFromNHS(data){
                     })
                 
                     if(idx != 0)  result.push(tmpSingle)
+
                    
                 })
                 
