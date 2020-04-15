@@ -396,10 +396,13 @@ async function getLocations(){
     area.forEach(async el => {
       // If doesnt exist
       if(utils.idIdxsInArrWithId(el.location, geo.data, 'name') == -1){
+
         
         let loca = encodeURI(el.location)
         
         await request.genGet(mapboxAPI+ loca +".json", [{name: "access_token", val: mapboxToken}], (res)=>{
+
+          console.log(res)
           
           if(res.status){
             let center = res.data.features[0].center

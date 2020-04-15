@@ -85,7 +85,7 @@ const areaData = [
     },
     {
         name: "wales",
-        link: "https://gov.wales/written-statement-coronavirus-covid-19-1",
+        link: "https://bing.com/covid/data",
         id: "announcement-item__article"
     }
 ]
@@ -98,11 +98,27 @@ let allCountires = {
 
 function getData(){
 
-    getDataFromNHS(figure[0])
-    getDataFromWDM(figure[1])
-    getAreaData()
-    getCountries(allCountires)
-    getTimeline(tlData)
+    try {
+
+        getDataFromNHS(figure[0])
+        getDataFromWDM(figure[1])
+
+        process.nextTick(()=>{
+            getAreaData()
+        })
+
+        process.nextTick(()=>{
+            getCountries(allCountires)
+        })
+
+        process.nextTick(()=>{
+            getTimeline(tlData)
+        })
+
+    } catch {
+
+    }
+
 }
 
 async function getAreaData(){
@@ -111,19 +127,14 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
-    //console.log(england)
-    //console.log(scotland)
-    //console.log(nIreland)
-    //console.log(wales)
-
 
     if(england && scotland && nIreland && wales){
         
         let res = england.concat(scotland)
+        res = res.concat(wales)
         
-        // Wales and Northern Ireland are as one due to there is no regional data available
-        if(wales) res.push(wales)
-        if(nIreland) res.push(nIreland)
+        // Northern Ireland is as one due to there is no regional data available
+        res.push(nIreland)
         
         let ready = {
             area: addSlashes(JSON.stringify(res))
@@ -409,8 +420,52 @@ function getScotlandFromNHS(data){
 function getWales(data){
 
     return new Promise(async resolve => {
-        let wales = await database.getWales()
-        resolve({location: "Wales", number: wales.wales})
+
+        let result = []
+        //let wales = await database.getWales()
+
+        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
+            if(err){
+                recordError("wales", "timeout", res)
+                resolve(false)
+            } else {
+                let all = JSON.parse(res.text)
+
+                all = all['areas']
+
+                let wr = []
+
+                for(let i=0;i<all.length;i++){
+                    if(all[i].id == "unitedkingdom"){
+                        let tmp = all[i].areas
+                        for(let ix=0; ix< tmp.length; ix++){
+                            if(tmp[ix].id == "wales_unitedkingdom"){
+                                wr = tmp[ix]['areas']
+                            }
+                        }
+                        
+                    }
+                }
+
+                for(let ii=0;ii<wr.length;ii++){
+                    //console.log(wr[ii]['totalConfirmed'])
+                    let num = 0
+
+                    // Check is number
+                    if(wr[ii]['totalConfirmed'] && !isNaN(wr[ii]['totalConfirmed'])){
+                        num = wr[ii]['totalConfirmed']
+                    } else {
+                        num = 0
+                    }
+                    result.push({ location: wr[ii]['displayName'], number: num})
+
+                }
+
+                resolve(result)
+                
+            }
+        })
+        //resolve({location: "Wales", number: wales.wales})
 
         /*var result = 0
 
@@ -540,8 +595,6 @@ function getTimeline(data){
                 
             })
 
-            
-            
 
         }
     })
