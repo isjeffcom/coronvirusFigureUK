@@ -203,6 +203,15 @@ async function getWales(){
     return shadow
 }
 
+async function getnIreland(){
+    const shadow = await db
+    .select("nireland")
+    .from("current_shadow")
+    .queryRow()
+
+    return shadow
+}
+
 async function autoApprove(){
     const shadow = await db
     .select("*")
@@ -335,5 +344,6 @@ module.exports = {
     verifyPin: verifyPin,
     saveErr: saveErr,
     addHistory: addHistory,
-    getWales: getWales
+    getWales: getWales,
+    getnIreland: getnIreland
 }

@@ -354,11 +354,20 @@ app.get('/historyupdate', async (req, res) => {
 })
 
 // Schedule Tasks
-var updateAll = schedule.scheduleJob('updateall', '01 * * * *', 'Europe/London', function(){
+var updateAll = schedule.scheduleJob('updateall', '05 * * * *', 'Europe/London', function(){
   updateData()
   setTimeout(()=>{
     database.autoApprove()
-  }, 20000)
+  }, 25000)
+  return
+})
+
+// Schedule Tasks
+var updateAll2 = schedule.scheduleJob('updateall2', '35 * * * *', 'Europe/London', function(){
+  updateData()
+  setTimeout(()=>{
+    database.autoApprove()
+  }, 25000)
   return
 })
 
@@ -424,9 +433,7 @@ async function updateData(){
   // Put data in 10 sec with or without new data
   setTimeout(async()=>{
 
-    
-
-    database.autoApprove()
+    //database.autoApprove()
 
     putData()
 

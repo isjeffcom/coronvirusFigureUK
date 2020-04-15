@@ -35,6 +35,7 @@ const utils = require('./utils')
 const database = require('./database')
 const { addSlashes } = require('slashes')
 const csv = require('csv-parser')
+const puppeteer = require('puppeteer')
 
 // File System
 const fs = require('fs')
@@ -69,8 +70,8 @@ const tlData = { link: "https://www.gov.uk/guidance/coronavirus-covid-19-informa
 const areaData = [
     {
         name: "england",
-        link: "http://www.arcgis.com/sharing/rest/content/items/b684319181f94875a6879bbc833ca3a6/data",
-        id: "download-csv-file"
+        link: "https://coronavirus.data.gov.uk/#local-authorities",
+        id: "local-authorities"
     },
     {
         name: "scotland",
@@ -89,12 +90,18 @@ const areaData = [
     }
 ]
 
+let allCountires = {
+    name: "all",
+    link: "https://coronavirus.data.gov.uk/#countries",
+    id: "countries"
+}
+
 function getData(){
 
     getDataFromNHS(figure[0])
-    getMoreFromNHS(figure[0])
     getDataFromWDM(figure[1])
     getAreaData()
+    getCountries(allCountires)
     getTimeline(tlData)
 }
 
@@ -103,6 +110,11 @@ async function getAreaData(){
     const scotland = await getScotlandFromNHS(areaData[1])
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
+
+    //console.log(england)
+    //console.log(scotland)
+    //console.log(nIreland)
+    //console.log(wales)
 
 
     if(england && scotland && nIreland && wales){
@@ -121,76 +133,6 @@ async function getAreaData(){
             database.update(1, ready)
         }
     }
-}
-
-function getMoreFromNHS(data){
-    return new Promise(resolve => {
-
-        var ready = {
-            england: 0,
-            scotland: 0,
-            wales: 0,
-            nireland: 0
-        }
-        
-        const readXlsxFile = require('read-excel-file/node');
-
-        const file = fs.createWriteStream("nation.xlsx");
-
-        const request = http.get(data.more, response => {
-            if(response.statusCode == 200){
-                var pipe = response.pipe(file)
-
-                response.on('end', ()=>{
-                    // Call only when pipe ended
-                    let f = fs.createReadStream('nation.xlsx')
-                    
-                    readXlsxFile(f).then((rows) => {
-                        if(rows.length > 0){
-                            
-                            for(let i=0;i<rows[0].length;i++){
-                                
-                                /*if(rows[0][i] == "TotalUKDeaths"){
-                                    ready.death = rows[1][i]
-                                    
-                                } */
-
-                                if(rows[0][i] == "EnglandCases"){
-                                    ready.england = rows[1][i]
-                                }
-
-                                else if(rows[0][i] == "ScotlandCases"){
-                                    ready.scotland = rows[1][i]
-                                }
-
-                                else if(rows[0][i] == "WalesCases"){
-                                    ready.wales = rows[1][i]
-                                }
-
-                                else if(rows[0][i] == "NICases"){
-                                    ready.nireland = rows[1][i]
-                                }
-                                
-                            }
-
-                            database.update(1, ready)
-                            resolve(true)
-                        } else {
-                            resolve(false)
-                        }
-                        
-                    })
-                })
-
-            } else {
-                resolve(false)
-            }
-        }).on('error', err => {
-            console.error(err)
-            resolve(false)
-        })
-
-    })
 }
 
 // get NHS offical data
@@ -332,43 +274,66 @@ function getDataFromWDM(data){
 
 function getEnglandFromNHS(data){
     return new Promise(resolve => {
+        let result = []
 
-        var results = []
+            puppeteer
+            .launch({ args: ['--no-sandbox']})
+            .then(browser => browser.newPage())
+            .then(page => {
+                return page.goto(data.link, {waitUntil: 'networkidle0'}).then(function() {
+                    return page.content();
+                });
+            })
+            .then(html => {
+                const $ = cheerio.load(html);
+                let tables = $('#' + data.id + ' table')
+                let trs = $(tables[0]).find('tbody tr')
 
-        const http = require('http');
+                //console.log(trs.text())
+                trs.each(function (idx, value){
+                
+                    $value = $(value).find('td')
+                    let tmpSingle = {}
+                    $value.each(function (idxx, single) {
 
-        const file = fs.createWriteStream("england_data.csv");
-        const request = http.get(data.link, function(response) {
-            if(response.statusCode == 200){
+                        if(idxx == 0){
+                            let locText = $(single).text()
+                            
+                            tmpSingle.location = locText.replace(/\n/g,'')
 
-                response.pipe(file)
+                            // Remove both front and back space
+                            tmpSingle.location = utils.removeFBSpace(tmpSingle.location)
+                        } 
 
+                        if(idxx == 1) {
+                            let tx = $(single).text().replace(/,/g, "")
 
-                fs.createReadStream('england_data.csv')
-                .pipe(csv())
-                .on('data', (data) => {
-                    if(data["TotalCases"] && data["GSS_NM"]){
-                        let num = data.TotalCases
-                        if(!num && isNaN(num)){
-                            num = 0 
+                            // Some are *
+                            if(!tx || isNaN(tx)){
+                                tmpSingle.number = 0
+                            } else {
+                                tmpSingle.number = parseInt(tx)
+                            }
+                            
+                            // Some might completely none
+                            if(isNaN(tmpSingle.number)){
+                                tmpSingle.number = 0
+                            }
+                            
                         }
-                        num = num.replace(/,/g, "")
-                        let tmp = {location: data.GSS_NM, number: parseInt(num)}
-                        results.push(tmp)
-                    }
-                })
-                .on('end', () => {
+                        
+                        
+                    })
+                
+                    result.push(tmpSingle)
 
-                    resolve(results)
+                    
                 })
-            } else {
-                resolve(false)
-            }
-        }).on("error", ()=>{
-            resolve(false)
-        })
-
+                resolve(result)
+            })
+            .catch(console.error);
     })
+
 }
 
 function getScotlandFromNHS(data){
@@ -481,7 +446,12 @@ function getWales(data){
 
 function getNIreland(data){
 
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
+        let nireland = await database.getnIreland()
+        resolve({location: "Northern Ireland", number: nireland.nireland})
+    })
+
+    /*return new Promise(resolve => {
 
         var result = 0
 
@@ -505,7 +475,7 @@ function getNIreland(data){
             }
         })
 
-    })
+    })*/
 }
 
 function recordError(source, reason, data){
@@ -577,6 +547,78 @@ function getTimeline(data){
     })
 }
 
+
+function getCountries(data){
+
+        let result = []
+
+            puppeteer
+            .launch({ args: ['--no-sandbox']})
+            .then(browser => browser.newPage())
+            .then(page => {
+                return page.goto(data.link, {waitUntil: 'networkidle0'}).then(function() {
+                    return page.content();
+                });
+            })
+            .then(html => {
+                const $ = cheerio.load(html);
+                let tables = $('#' + data.id + ' table')
+                let trs = $(tables[0]).find('tbody tr')
+
+                //console.log(trs.text())
+                trs.each(function (idx, value){
+                
+                    $value = $(value).find('td')
+                    
+                    let tmpSingle = {}
+                    $value.each(function (idxx, single) {
+                        if(idxx == 0){
+                            let locText = $(single).text()
+                            
+                            tmpSingle.location = locText.replace(/\n/g,'')
+
+                            // Remove both front and back space
+                            tmpSingle.location = utils.removeFBSpace(tmpSingle.location)
+                        } 
+
+                        if(idxx == 1) {
+                            let tx = $(single).text().replace(/,/g, "")
+
+                            // Some are *
+                            if(!tx || isNaN(tx)){
+                                tmpSingle.number = 0
+                            } else {
+                                tmpSingle.number = parseInt(tx)
+                            }
+                            
+                            // Some might completely none
+                            if(isNaN(tmpSingle.number)){
+                                tmpSingle.number = 0
+                            }
+                            
+                        }
+                        
+                    })
+                
+                    result.push(tmpSingle)
+
+                    
+                })
+
+                //console.log(result)
+
+                tmp = {
+                    england: result[0].number,
+                    nIreland: result[1].number,
+                    scotland: result[2].number,
+                    wales: result[3].number
+                }
+                
+                database.update(1, tmp)
+
+            })
+            .catch(console.error);
+}
 
 module.exports={
     getData: getData
