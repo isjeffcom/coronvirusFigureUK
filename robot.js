@@ -116,7 +116,7 @@ function getData(){
         })
 
     } catch {
-
+        console.log("major error")
     }
 
 }
@@ -283,66 +283,69 @@ function getDataFromWDM(data){
     })
 }
 
-function getEnglandFromNHS(data){
-    return new Promise(resolve => {
-        let result = []
+async function getEnglandFromNHS(data){
+    return new Promise(async resolve => {
 
-            puppeteer
-            .launch({ args: ['--no-sandbox']})
-            .then(browser => browser.newPage())
-            .then(page => {
-                return page.goto(data.link, {waitUntil: 'networkidle0'}).then(function() {
-                    return page.content();
-                });
+
+        (async () => {
+            let result = []
+            const browser = await puppeteer.launch({ args: ['--no-sandbox']});
+            let page = await browser.newPage()
+            page = await page.goto(data.link, {waitUntil: 'networkidle0'}).then(function() {
+                return page.content();
             })
-            .then(html => {
-                const $ = cheerio.load(html);
-                let tables = $('#' + data.id + ' table')
-                let trs = $(tables[0]).find('tbody tr')
 
-                //console.log(trs.text())
-                trs.each(function (idx, value){
-                
-                    $value = $(value).find('td')
-                    let tmpSingle = {}
-                    $value.each(function (idxx, single) {
+            const $ = cheerio.load(page);
+            let tables = $('#' + data.id + ' table')
+            let trs = $(tables[0]).find('tbody tr')
 
-                        if(idxx == 0){
-                            let locText = $(single).text()
-                            
-                            tmpSingle.location = locText.replace(/\n/g,'')
+            //console.log(trs.text())
+            trs.each(function (idx, value){
+            
+                $value = $(value).find('td')
+                let tmpSingle = {}
+                $value.each(function (idxx, single) {
 
-                            // Remove both front and back space
-                            tmpSingle.location = utils.removeFBSpace(tmpSingle.location)
-                        } 
+                    if(idxx == 0){
+                        let locText = $(single).text()
+                        
+                        tmpSingle.location = locText.replace(/\n/g,'')
 
-                        if(idxx == 1) {
-                            let tx = $(single).text().replace(/,/g, "")
+                        // Remove both front and back space
+                        tmpSingle.location = utils.removeFBSpace(tmpSingle.location)
+                    } 
 
-                            // Some are *
-                            if(!tx || isNaN(tx)){
-                                tmpSingle.number = 0
-                            } else {
-                                tmpSingle.number = parseInt(tx)
-                            }
-                            
-                            // Some might completely none
-                            if(isNaN(tmpSingle.number)){
-                                tmpSingle.number = 0
-                            }
-                            
+                    if(idxx == 1) {
+                        let tx = $(single).text().replace(/,/g, "")
+
+                        // Some are *
+                        if(!tx || isNaN(tx)){
+                            tmpSingle.number = 0
+                        } else {
+                            tmpSingle.number = parseInt(tx)
                         }
                         
+                        // Some might completely none
+                        if(isNaN(tmpSingle.number)){
+                            tmpSingle.number = 0
+                        }
                         
-                    })
-                
-                    result.push(tmpSingle)
-
+                    }
+                    
                     
                 })
-                resolve(result)
+            
+                result.push(tmpSingle)
+
+                
             })
-            .catch(console.error);
+            await browser.close()
+
+            resolve(result)
+          
+            
+          })();
+
     })
 
 }
@@ -465,36 +468,6 @@ function getWales(data){
                 
             }
         })
-        //resolve({location: "Wales", number: wales.wales})
-
-        /*var result = 0
-
-        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
-            if(err){
-                recordError(data.source, "timeout", res)
-                resolve(false)
-            }else{
-                
-                let $ = cheerio.load(res.text)
-                let trs = $('#' + data.id + ' div')
-
-                let c = $($(trs)[0]).find('div')[2]
-                trs = ($(c).children()[2])
-
-                let txt = $(trs).text()
-                if(txt.indexOf("total") != -1){
-                    txt = txt.split(" ")
-                    let idx = txt.indexOf("cases")
-                    result = parseInt(txt[idx+2])
-                    
-                } else {
-                    result = null
-                }
-
-                resolve({location: "Wales", number: result})
-
-            }
-        })*/
 
     })
 }
@@ -505,32 +478,6 @@ function getNIreland(data){
         let nireland = await database.getnIreland()
         resolve({location: "Northern Ireland", number: nireland.nireland})
     })
-
-    /*return new Promise(resolve => {
-
-        var result = 0
-
-        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
-            if(err){
-                recordError(data.source, "timeout", res)
-                resolve(false)
-            }else{
-                
-                let $ = cheerio.load(res.text)
-                let trs = $('h2#' + data.id).next().next().next()
-                let txt = $(trs).text()
-                txt = txt.split(" ")
-
-                let txtIndex = txt.indexOf("Ireland")
-
-                // Maybe with ending period, ready for not
-                result = parseInt(txt[txtIndex+2])
-                resolve({location: "Northern Ireland", number: result})
-
-            }
-        })
-
-    })*/
 }
 
 function recordError(source, reason, data){
@@ -601,76 +548,70 @@ function getTimeline(data){
 }
 
 
-function getCountries(data){
+async function getCountries(data){
 
-        let result = []
-
-            puppeteer
-            .launch({ args: ['--no-sandbox']})
-            .then(browser => browser.newPage())
-            .then(page => {
-                return page.goto(data.link, {waitUntil: 'networkidle0'}).then(function() {
-                    return page.content();
-                });
+        (async () => {
+            let result = []
+            const browser = await puppeteer.launch({ args: ['--no-sandbox']});
+            let page = await browser.newPage()
+            page = await page.goto(data.link, {waitUntil: 'networkidle0'}).then(function() {
+                return page.content();
             })
-            .then(html => {
-                const $ = cheerio.load(html);
-                let tables = $('#' + data.id + ' table')
-                let trs = $(tables[0]).find('tbody tr')
 
-                //console.log(trs.text())
-                trs.each(function (idx, value){
+            const $ = cheerio.load(page);
+            let tables = $('#' + data.id + ' table')
+            let trs = $(tables[0]).find('tbody tr')
+
+            //console.log(trs.text())
+            trs.each(function (idx, value){
+            
+                $value = $(value).find('td')
                 
-                    $value = $(value).find('td')
-                    
-                    let tmpSingle = {}
-                    $value.each(function (idxx, single) {
-                        if(idxx == 0){
-                            let locText = $(single).text()
-                            
-                            tmpSingle.location = locText.replace(/\n/g,'')
+                let tmpSingle = {}
+                $value.each(function (idxx, single) {
+                    if(idxx == 0){
+                        let locText = $(single).text()
+                        
+                        tmpSingle.location = locText.replace(/\n/g,'')
 
-                            // Remove both front and back space
-                            tmpSingle.location = utils.removeFBSpace(tmpSingle.location)
-                        } 
+                        // Remove both front and back space
+                        tmpSingle.location = utils.removeFBSpace(tmpSingle.location)
+                    } 
 
-                        if(idxx == 1) {
-                            let tx = $(single).text().replace(/,/g, "")
+                    if(idxx == 1) {
+                        let tx = $(single).text().replace(/,/g, "")
 
-                            // Some are *
-                            if(!tx || isNaN(tx)){
-                                tmpSingle.number = 0
-                            } else {
-                                tmpSingle.number = parseInt(tx)
-                            }
-                            
-                            // Some might completely none
-                            if(isNaN(tmpSingle.number)){
-                                tmpSingle.number = 0
-                            }
-                            
+                        // Some are *
+                        if(!tx || isNaN(tx)){
+                            tmpSingle.number = 0
+                        } else {
+                            tmpSingle.number = parseInt(tx)
                         }
                         
-                    })
-                
-                    result.push(tmpSingle)
-
+                        // Some might completely none
+                        if(isNaN(tmpSingle.number)){
+                            tmpSingle.number = 0
+                        }
+                        
+                    }
                     
                 })
+            
+                result.push(tmpSingle)
 
-                //console.log(result)
-
-                tmp = {
-                    england: result[0].number,
-                    nIreland: result[1].number,
-                    scotland: result[2].number,
-                    wales: result[3].number
-                }
                 
-                database.update(1, tmp)
-
             })
-            .catch(console.error);
+
+            tmp = {
+                england: result[0].number,
+                nIreland: result[1].number,
+                scotland: result[2].number,
+                wales: result[3].number
+            }
+            
+            database.update(1, tmp)
+            await browser.close()
+        })();
 }
 
 module.exports={

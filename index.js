@@ -354,7 +354,7 @@ app.get('/historyupdate', async (req, res) => {
 })
 
 // Schedule Tasks
-var updateAll = schedule.scheduleJob('updateall', '05 * * * *', 'Europe/London', function(){
+var updateAll = schedule.scheduleJob('updateall', '30 * * * *', 'Europe/London', function(){
   updateData()
   setTimeout(()=>{
     database.autoApprove()
@@ -362,14 +362,6 @@ var updateAll = schedule.scheduleJob('updateall', '05 * * * *', 'Europe/London',
   return
 })
 
-// Schedule Tasks
-var updateAll2 = schedule.scheduleJob('updateall2', '35 * * * *', 'Europe/London', function(){
-  updateData()
-  setTimeout(()=>{
-    database.autoApprove()
-  }, 25000)
-  return
-})
 
 var recordHistory = schedule.scheduleJob('history', '10 50 23 * * *', 'Europe/London', async () => {
   let save = await database.saveHistory()
