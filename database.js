@@ -118,6 +118,12 @@ async function historyFigures(){
         "serious",
         "negative",
         "suspected",
+        "tested",
+        "test_done",
+        "england",
+        "scotland",
+        "wales",
+        "nireland"
     ])
     .from("history")
     .orderby("date asc")
