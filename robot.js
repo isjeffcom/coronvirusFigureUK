@@ -169,6 +169,8 @@ function getDataFromNHS(data){
                 let testTxt = testReady.text()
                 testTxt = testTxt.split(" ")
 
+                
+
                 let posiReady = $(ele).next().next()
                 let posiTxt = posiReady.text()
                 posiTxt = posiTxt.split(" ")
@@ -180,7 +182,7 @@ function getDataFromNHS(data){
                 let teMIdx = utils.idIdxsInArr("tests", testTxt) // return an array with position with word 'positive'
                 let cMIdx = utils.idIdxsInArr("positive.", posiTxt) // return an array with position with word 'positive'
                 let tMIdx = utils.idIdxsInArr("tested", posiTxt) // return an array with negative with word 'negative'
-                let dMIdx = utils.idIdxsInArr("died", txtDeath) // return an array with negative with word 'negative'
+                let dMIdx = utils.idIdxsInArr("died.", txtDeath) // return an array with negative with word 'negative'
 
                 if(cMIdx != -1 
                     && tMIdx != -1 
@@ -188,12 +190,18 @@ function getDataFromNHS(data){
                     && tMIdx.length > 0 
                     && posiTxt.length>0){
 
+                        
+
                     // Process and save to number
                     let testedDone = parseInt(testTxt[teMIdx[0] - 1].replace(/,/g, ""))
-                    let confirmed = parseInt(posiTxt[cMIdx[0] - 2].replace(/,/g, ""))
+                    
+                    let confirmed = parseInt(posiTxt[cMIdx[0] - 3].replace(/,/g, ""))
+                    
                     let tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
+                    
                     let negative = tested - confirmed
-                    let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
+                    let death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
+
 
                     // Record if Error and return
                     if(isNaN(confirmed) || isNaN(negative)){
