@@ -100,14 +100,14 @@ function getData(){
 
     try {
 
-        //getDataFromNHS(figure[0])
-        //getDataFromWDM(figure[1])
+        getDataFromNHS(figure[0])
+        /*getDataFromWDM(figure[1])
 
         process.nextTick(()=>{
             getAreaData()
         })
 
-        /*process.nextTick(()=>{
+        process.nextTick(()=>{
             getCountries(allCountires)
         })
 
@@ -154,7 +154,6 @@ function getDataFromNHS(data){
 
         var tmp = utils.deepCopy(struct.getStruct())
 
-
         if (err) {
 
             recordError(data.source, "timeout", err)
@@ -191,8 +190,6 @@ function getDataFromNHS(data){
                     && tMIdx.length > 0 
                     && posiTxt.length>0){
 
-                        
-
                     // Process and save to number
                     let testedDone = parseInt(testTxt[teMIdx[0] - 1].replace(/,/g, ""))
                     
@@ -202,8 +199,7 @@ function getDataFromNHS(data){
                     
                     let negative = tested - confirmed
                     let death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
-
-
+                    
                     // Record if Error and return
                     if(isNaN(confirmed) || isNaN(negative)){
                         let errData = {
@@ -225,6 +221,8 @@ function getDataFromNHS(data){
                     tmp.death = death ? death : -1
                     tmp.tested = tested ? tested : -1
                     tmp.test_done = testedDone ? testedDone : -1
+
+                    
 
                     tmp.ts = utils.getTS()
 

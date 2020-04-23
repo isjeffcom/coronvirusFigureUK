@@ -393,8 +393,6 @@ async function getLocations(){
         let loca = encodeURI(el.location)
         
         await request.genGet(mapboxAPI+ loca +".json", [{name: "access_token", val: mapboxToken}], (res)=>{
-
-          console.log(res)
           
           if(res.status){
             let center = res.data.features[0].center
