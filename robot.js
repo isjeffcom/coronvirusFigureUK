@@ -100,20 +100,20 @@ function getData(){
 
     try {
 
-        getDataFromNHS(figure[0])
-        getDataFromWDM(figure[1])
+        //getDataFromNHS(figure[0])
+        //getDataFromWDM(figure[1])
 
         process.nextTick(()=>{
             getAreaData()
         })
 
-        process.nextTick(()=>{
+        /*process.nextTick(()=>{
             getCountries(allCountires)
         })
 
         process.nextTick(()=>{
             getTimeline(tlData)
-        })
+        })*/
 
     } catch {
         console.log("major error")
@@ -127,6 +127,7 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
+    console.log(wales)
 
     if(england && scotland && nIreland && wales){
         
@@ -433,9 +434,9 @@ function getWales(data){
     return new Promise(async resolve => {
 
         let result = []
-        //let wales = await database.getWales()
-
-        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
+        let wales = await database.getWales()
+        resolve({ location: "Wales", number: wales.wales})
+        /*superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
             if(err){
                 recordError("wales", "timeout", res)
                 resolve(false)
@@ -475,7 +476,7 @@ function getWales(data){
                 resolve(result)
                 
             }
-        })
+        })*/
 
     })
 }
