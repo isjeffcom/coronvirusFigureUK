@@ -101,7 +101,7 @@ function getData(){
     try {
 
         getDataFromNHS(figure[0])
-        /*getDataFromWDM(figure[1])
+        getDataFromWDM(figure[1])
 
         process.nextTick(()=>{
             getAreaData()
@@ -113,7 +113,7 @@ function getData(){
 
         process.nextTick(()=>{
             getTimeline(tlData)
-        })*/
+        })
 
     } catch {
         console.log("major error")
