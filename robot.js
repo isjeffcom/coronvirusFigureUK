@@ -198,7 +198,9 @@ function getDataFromNHS(data){
                     let tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
                     
                     let negative = tested - confirmed
-                    let death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
+                    let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
+
+                    console.log(death)
                     
                     // Record if Error and return
                     if(isNaN(confirmed) || isNaN(negative)){
