@@ -16,8 +16,8 @@
 
 
 const DbClient = require("ali-mysql-client")
-const utils = require('./utils')
 const conf = require('./conf')
+const utils = require('./utils')
 const { stripSlashes } = require('slashes')
 const md5 = require('md5')
 

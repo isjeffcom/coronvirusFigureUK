@@ -3,3 +3,7 @@ node_modules
 conf.js
 england_data.csv
 nation.xlsx
+wales.xlsx
+walesregion.js
+death_fix.js
+death_fix.json
