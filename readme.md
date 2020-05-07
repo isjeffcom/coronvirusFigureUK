@@ -70,7 +70,8 @@ https://covid19nz.live
 
 # Contact
 If you are using this API, please join this discussion board. Keep updated for any significant changes!! <br>
-https://spectrum.chat/covid-19-uk-update
+https://www.facebook.com/groups/2944338405655888
+
 <br><br>
 WeChat Group:<br>
 <img src="https://i.ibb.co/1MhZfG4/bdbf.jpg" width="30%">

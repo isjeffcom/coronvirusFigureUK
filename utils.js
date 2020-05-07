@@ -76,6 +76,19 @@ function removeFBSpace(str){
     return str.replace(/(^\s*)|(\s*$)/g, ""); 
 }
 
+function tsToDate(ts){
+    let d = new Date(ts)
+    return d.getFullYear() + "-" + addZero(d.getMonth() + 1) + "-" + addZero(d.getDate())
+}
+
+function addZero(str){
+    if(str < 10){
+        return "0" + str
+    } else {
+        return str
+    }
+}
+
 
 module.exports = {
     deepCopy: deepCopy,
@@ -84,5 +97,6 @@ module.exports = {
     idIdxsInArrWithId: idIdxsInArrWithId,
     matchNum: matchNum,
     isJson: isJson,
+    tsToDate: tsToDate,
     removeFBSpace: removeFBSpace
 }

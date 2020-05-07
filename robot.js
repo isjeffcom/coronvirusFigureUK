@@ -33,9 +33,10 @@ const superagent= require('superagent')
 const cheerio = require('cheerio')
 const utils = require('./utils')
 const database = require('./database')
-const { addSlashes } = require('slashes')
-const csv = require('csv-parser')
+const { addSlashes, stripSlashes } = require('slashes')
+//const csv = require('csv-parser')
 const puppeteer = require('puppeteer')
+const readXlsxFile = require('read-excel-file/node')
 
 // File System
 const fs = require('fs')
@@ -65,13 +66,16 @@ const figure = [
     }
 ]
 
+const monthName = ['jan', 'feb', 'mar', 'april', 'may', 'june', 'july', 'aug', 'sep', 'nov', 'dec']
+
 const tlData = { link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public", id: "full-history" }
+const hospitalData = {source: "gov", link: "https://www.gov.uk/government/publications/slides-and-datasets-to-accompany-coronavirus-press-conference-", class: "attachment-details"}
 
 const areaData = [
     {
         name: "england",
-        link: "https://coronavirus.data.gov.uk/#local-authorities",
-        id: "local-authorities"
+        link: "https://coronavirus.data.gov.uk/#category=utlas&map=rate",
+        id: "utlas"
     },
     {
         name: "scotland",
@@ -92,8 +96,8 @@ const areaData = [
 
 let allCountires = {
     name: "all",
-    link: "https://coronavirus.data.gov.uk/#countries",
-    id: "countries"
+    link: "https://coronavirus.data.gov.uk/#category=nations&map=rate",
+    id: "nations"
 }
 
 function getData(){
@@ -109,6 +113,10 @@ function getData(){
 
         process.nextTick(()=>{
             getCountries(allCountires)
+        })
+
+        process.nextTick(()=>{
+            getHospitalData(hospitalData)
         })
 
         process.nextTick(()=>{
@@ -167,8 +175,6 @@ function getDataFromNHS(data){
                 let testTxt = testReady.text()
                 testTxt = testTxt.split(" ")
 
-                
-
                 let posiReady = $(ele).next().next()
                 let posiTxt = posiReady.text()
                 posiTxt = posiTxt.split(" ")
@@ -196,7 +202,7 @@ function getDataFromNHS(data){
                     let tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
                     
                     let negative = tested - confirmed
-                    let death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
+                    let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
 
                     //console.log(confirmed, tested, negative, death, testedDone)
 
@@ -346,12 +352,13 @@ async function getEnglandFromNHS(data){
 
                 
             })
+            
             await browser.close()
 
             resolve(result)
           
             
-          })();
+        })();
 
     })
 
@@ -420,7 +427,7 @@ function getScotlandFromNHS(data){
             }
         })
 
-      })
+    })
 
     
 }
@@ -434,47 +441,6 @@ function getWales(data){
         let result = []
         let wales = await database.getWales()
         resolve({ location: "Wales", number: wales.wales})
-        /*superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
-            if(err){
-                recordError("wales", "timeout", res)
-                resolve(false)
-            } else {
-                let all = JSON.parse(res.text)
-
-                all = all['areas']
-
-                let wr = []
-
-                for(let i=0;i<all.length;i++){
-                    if(all[i].id == "unitedkingdom"){
-                        let tmp = all[i].areas
-                        for(let ix=0; ix< tmp.length; ix++){
-                            if(tmp[ix].id == "wales_unitedkingdom"){
-                                wr = tmp[ix]['areas']
-                            }
-                        }
-                        
-                    }
-                }
-
-                for(let ii=0;ii<wr.length;ii++){
-                    //console.log(wr[ii]['totalConfirmed'])
-                    let num = 0
-
-                    // Check is number
-                    if(wr[ii]['totalConfirmed'] && !isNaN(wr[ii]['totalConfirmed'])){
-                        num = wr[ii]['totalConfirmed']
-                    } else {
-                        num = 0
-                    }
-                    result.push({ location: wr[ii]['displayName'], number: num})
-
-                }
-
-                resolve(result)
-                
-            }
-        })*/
 
     })
 }
@@ -510,6 +476,123 @@ function recordError(source, reason, data){
         // dont stop main thread
     }
 
+}
+
+
+// Get Hospital Data
+function getHospitalData(data){
+    return new Promise(async resolve => {
+
+        var ready = {}
+
+        let d = new Date()
+
+        var now = await database.getHospitalArea()
+        now = JSON.parse(stripSlashes(now.hospitalArea))
+
+        //console.log(data.link + d.getDate() + '-' + monthName[d.getMonth()] + '-' + d.getFullYear())
+
+        superagent.get(data.link + (d.getDate()-1) + '-' + monthName[d.getMonth()] + '-' + d.getFullYear()).timeout(timeoutDefault).end((err, res) => {
+            
+            if(err){
+                // Wont update if link doesnt existd yet
+                //recordError(data.source, "timeout", err)
+                resolve(false)
+            }else{
+
+
+                let $ = cheerio.load(res.text)
+                let att = $('.' + data.class + ' a')
+
+                let link = false
+                // Search download link contains .xlsx
+
+                for(let i=0;i<att.length;i++){
+                    let tmpLink = $(att[i]).attr('href')
+                    
+
+                    if(tmpLink.indexOf('.xlsx') != -1){
+                        link = tmpLink
+                    }
+                }
+
+                if(link){
+                    const file = fs.createWriteStream("hospital.xlsx")
+                    const request = https.get(link, function(response) {
+                        response.pipe(file)
+
+                        file.on('finish', ()=>{
+
+                            const { getJsDateFromExcel } = require("excel-date-to-js")
+
+                            readXlsxFile('./hospital.xlsx', { sheet: 5 }).then(async (res)=>{
+
+                                let today = utils.tsToDate(new Date('2020-05-06').getTime())
+                                let tmpArea = {england: 0, scotland: 0, nIreland: 0, wales: 0}
+                                let tmpAll = { hospital: 0 }
+
+                                for(let c=0;c<res.length;c++){
+                                    let row = res[c]
+                                    //console.log(isNaN(row[0]), isNaN(row[2]))
+                                    if(!isNaN(row[0]) && !isNaN(row[2])){
+
+                                        let thisDate = new Date(getJsDateFromExcel(row[0])).getTime()
+
+                                        let num = row[2]
+                                        let locName = row[1]
+
+                                        // If is today
+                                        if(utils.tsToDate(thisDate) == today){
+                                            tmpAll.hospital += num
+
+                                            if(locName == "Scotland" ){
+                                                tmpArea.scotland = num
+                                            }
+                            
+                                            else if(locName == "Wales"){
+                                                tmpArea.wales = num
+                                            }
+                            
+                                            else if(locName == "Northern Ireland"){
+                                                tmpArea.nIreland = num
+                                            }
+                            
+                                            else{
+                                                tmpArea.england += num
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //console.log(tmpArea)
+                                //console.log(tmpAll)
+
+
+                                tmpArea.england = tmpArea.england == 0 ? now.england : tmpArea.england
+                                tmpArea.scotland = tmpArea.scotland == 0 ? now.scotland : tmpArea.scotland
+                                tmpArea.wales = tmpArea.wales == 0 ? now.wales : tmpArea.wales
+                                tmpArea.nIreland = tmpArea.nIreland == 0 ? now.nIreland : tmpArea.nIreland
+
+                                ready.hospital = tmpAll.hospital
+                                ready.hospitalArea = addSlashes(JSON.stringify(tmpArea))
+
+                                database.update(1, ready)
+
+                                //console.log(ready)
+
+                            })
+                        })
+                    })
+
+                }
+                
+                
+                resolve(true)
+
+            }
+        })
+
+    })
 }
 
 function getTimeline(data){

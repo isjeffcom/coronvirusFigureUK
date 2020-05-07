@@ -123,7 +123,10 @@ async function historyFigures(){
         "england",
         "scotland",
         "wales",
-        "nireland"
+        "nireland",
+        "hospital",
+        "hospitalArea",
+        "icuArea"
     ])
     .from("history")
     .orderby("date asc")
@@ -296,6 +299,9 @@ async function saveHistory(){
         scotland: result[0].scotland,
         wales: result[0].wales,
         nireland: result[0].nireland,
+        hospital: result[0].hospital,
+        hospitalArea: result[0].hospitalArea,
+        icuArea: result[0].icuArea,
         area: result[0].area
     }
 
@@ -320,8 +326,44 @@ async function addHistory(ready){
     const save = await db
         .insert("history", ready)
         .execute()
-
 }
+
+async function getHospitalArea(){
+    const res = await db
+    .select("hospitalArea")
+    .from("current")
+    .queryRow()
+
+    return res
+}
+
+async function updateHistory(ready, id){
+
+    const save = await db
+        .update("history", ready)
+        .where('id', id)
+        .execute()
+}
+
+async function updateHistoryByDate(ready, date){
+
+    const all = await db
+    .select('*')
+    .from('history')
+    .queryList()
+
+    for(let i=0;i<all.length;i++){
+        if(date == utils.tsToDate(all[i].date)){
+            const save = await db
+            .update("history", ready)
+            .where('date', all[i].date)
+            .execute()
+        }
+    }
+
+    
+}
+
 
 async function saveErr(ready){
     const save = await db
@@ -350,6 +392,9 @@ module.exports = {
     verifyPin: verifyPin,
     saveErr: saveErr,
     addHistory: addHistory,
+    updateHistory:updateHistory,
+    updateHistoryByDate: updateHistoryByDate,
+    getHospitalArea: getHospitalArea,
     getWales: getWales,
     getnIreland: getnIreland
 }
