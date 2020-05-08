@@ -203,7 +203,11 @@ function getDataFromNHS(data){
                     
                     let negative = tested - confirmed
                     let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
-
+                    
+                    // 2 or 3, changing all the time
+                    if(!death) death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
+                    
+                    // Debug Line
                     //console.log(confirmed, tested, negative, death, testedDone)
 
                     // Record if Error and return
