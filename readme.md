@@ -74,7 +74,7 @@ https://www.facebook.com/groups/2944338405655888
 
 <br><br>
 WeChat Group:<br>
-<img src="https://i.ibb.co/1MhZfG4/bdbf.jpg" width="30%">
+<img src="https://i.ibb.co/nBLCKVH/qr.jpg" width="30%">
 
 https://isjeff.com
 hello@isjeff.com
