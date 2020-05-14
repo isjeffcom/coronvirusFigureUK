@@ -328,6 +328,15 @@ async function addHistory(ready){
         .execute()
 }
 
+async function getHospital(){
+    const res = await db
+    .select("hospital")
+    .from("current")
+    .queryRow()
+
+    return res
+}
+
 async function getHospitalArea(){
     const res = await db
     .select("hospitalArea")
@@ -394,6 +403,7 @@ module.exports = {
     addHistory: addHistory,
     updateHistory:updateHistory,
     updateHistoryByDate: updateHistoryByDate,
+    getHospital: getHospital,
     getHospitalArea: getHospitalArea,
     getWales: getWales,
     getnIreland: getnIreland

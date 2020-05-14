@@ -104,7 +104,7 @@ function getData(){
 
     try {
 
-        getDataFromNHS(figure[0])
+        /*getDataFromNHS(figure[0])
         getDataFromWDM(figure[1])
 
         process.nextTick(()=>{
@@ -113,15 +113,15 @@ function getData(){
 
         process.nextTick(()=>{
             getCountries(allCountires)
-        })
+        })*/
 
         process.nextTick(()=>{
             getHospitalData(hospitalData)
         })
 
-        process.nextTick(()=>{
+        /*process.nextTick(()=>{
             getTimeline(tlData)
-        })
+        })*/
 
     } catch {
         console.log("major error")
@@ -491,8 +491,11 @@ function getHospitalData(data){
 
         let d = new Date()
 
-        var now = await database.getHospitalArea()
+        let now = await database.getHospitalArea()
         now = JSON.parse(stripSlashes(now.hospitalArea))
+
+        let nowFigure = await database.getHospital()
+        nowFigure = nowFigure.hospital
 
         //console.log(data.link + d.getDate() + '-' + monthName[d.getMonth()] + '-' + d.getFullYear())
 
@@ -577,7 +580,7 @@ function getHospitalData(data){
                                 tmpArea.wales = tmpArea.wales == 0 ? now.wales : tmpArea.wales
                                 tmpArea.nIreland = tmpArea.nIreland == 0 ? now.nIreland : tmpArea.nIreland
 
-                                ready.hospital = tmpAll.hospital
+                                ready.hospital = tmpAll.hospital == 0 ? nowFigure : tmpAll.hospital
                                 ready.hospitalArea = addSlashes(JSON.stringify(tmpArea))
 
                                 database.update(1, ready)
