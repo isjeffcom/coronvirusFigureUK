@@ -69,7 +69,7 @@ const figure = [
 const monthName = ['jan', 'feb', 'mar', 'april', 'may', 'june', 'july', 'aug', 'sep', 'nov', 'dec']
 
 const tlData = { link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public", id: "full-history" }
-const hospitalData = {source: "gov", link: "https://www.gov.uk/government/publications/slides-and-datasets-to-accompany-coronavirus-press-conference-", class: "attachment-details"}
+const hospitalData = {source: "gov", link: "https://www.gov.uk/government/publications/slides-to-accompany-coronavirus-press-conference-", class: "attachment-details"}
 
 const areaData = [
     {
@@ -529,9 +529,9 @@ function getHospitalData(data){
 
                             const { getJsDateFromExcel } = require("excel-date-to-js")
 
-                            readXlsxFile('./hospital.xlsx', { sheet: 5 }).then(async (res)=>{
+                            readXlsxFile('./hospital.xlsx', { sheet: 8 }).then(async (res)=>{
 
-                                let today = utils.tsToDate(new Date('2020-05-06').getTime())
+                                let today = utils.tsToDate(new Date().getTime())
                                 let tmpArea = {england: 0, scotland: 0, nIreland: 0, wales: 0}
                                 let tmpAll = { hospital: 0 }
 
