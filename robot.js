@@ -69,7 +69,7 @@ const figure = [
 const monthName = ['jan', 'feb', 'mar', 'april', 'may', 'june', 'july', 'aug', 'sep', 'nov', 'dec']
 
 const tlData = { link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public", id: "full-history" }
-const hospitalData = {source: "gov", link: "https://www.gov.uk/government/publications/slides-to-accompany-coronavirus-press-conference-", class: "attachment-details"}
+const hospitalData = {source: "gov", link: "https://www.gov.uk/government/publications/slides-and-datasets-to-accompany-coronavirus-press-conference-", class: "attachment-details"}
 
 const areaData = [
     {
@@ -104,7 +104,7 @@ function getData(){
 
     try {
 
-        /*getDataFromNHS(figure[0])
+        getDataFromNHS(figure[0])
         getDataFromWDM(figure[1])
 
         process.nextTick(()=>{
@@ -113,15 +113,15 @@ function getData(){
 
         process.nextTick(()=>{
             getCountries(allCountires)
-        })*/
+        })
+
+        process.nextTick(()=>{
+            getTimeline(tlData)
+        })
 
         process.nextTick(()=>{
             getHospitalData(hospitalData)
         })
-
-        /*process.nextTick(()=>{
-            getTimeline(tlData)
-        })*/
 
     } catch {
         console.log("major error")
@@ -497,9 +497,10 @@ function getHospitalData(data){
         let nowFigure = await database.getHospital()
         nowFigure = nowFigure.hospital
 
-        //console.log(data.link + d.getDate() + '-' + monthName[d.getMonth()] + '-' + d.getFullYear())
 
         superagent.get(data.link + (d.getDate()-1) + '-' + monthName[d.getMonth()] + '-' + d.getFullYear()).timeout(timeoutDefault).end((err, res) => {
+
+            
             
             if(err){
                 // Wont update if link doesnt existd yet
@@ -532,7 +533,7 @@ function getHospitalData(data){
 
                             const { getJsDateFromExcel } = require("excel-date-to-js")
 
-                            readXlsxFile('./hospital.xlsx', { sheet: 8 }).then(async (res)=>{
+                            readXlsxFile('./hospital.xlsx', { sheet: 'People in Hospital (UK)' }).then(async (res)=>{
 
                                 let today = utils.tsToDate(new Date().getTime())
                                 let tmpArea = {england: 0, scotland: 0, nIreland: 0, wales: 0}
@@ -571,9 +572,6 @@ function getHospitalData(data){
                                     }
                                 }
 
-                                //console.log(tmpArea)
-                                //console.log(tmpAll)
-
 
                                 tmpArea.england = tmpArea.england == 0 ? now.england : tmpArea.england
                                 tmpArea.scotland = tmpArea.scotland == 0 ? now.scotland : tmpArea.scotland
@@ -583,9 +581,10 @@ function getHospitalData(data){
                                 ready.hospital = tmpAll.hospital == 0 ? nowFigure : tmpAll.hospital
                                 ready.hospitalArea = addSlashes(JSON.stringify(tmpArea))
 
+                                console.log(ready)
+
                                 database.update(1, ready)
 
-                                //console.log(ready)
 
                             })
                         })
