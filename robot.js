@@ -153,8 +153,10 @@ async function getAreaData(){
     }
 }
 
-// get NHS offical data
-function getDataFromNHS(data){
+// get Offical figures
+async function getDataFromNHS(data){
+
+    let current = await database.current()
 
     superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
 
@@ -197,9 +199,16 @@ function getDataFromNHS(data){
                     // Process and save to number
                     let testedDone = parseInt(testTxt[teMIdx[0] - 1].replace(/,/g, ""))
                     
-                    let confirmed = parseInt(posiTxt[cMIdx[0] - 2].replace(/,/g, ""))
-                    
-                    let tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
+                    let confirmed = parseInt(posiTxt[cMIdx[0] - 4].replace(/,/g, ""))
+
+                    let tested = -1
+
+
+                    try{
+                        tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
+                    } catch{
+                        tested = current.data[0].tested
+                    }
                     
                     let negative = tested - confirmed
                     let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
@@ -208,7 +217,7 @@ function getDataFromNHS(data){
                     if(!death) death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
                     
                     // Debug Line
-                    //console.log(confirmed, tested, negative, death, testedDone)
+                    // console.log(confirmed, tested, negative, death, testedDone)
 
                     // Record if Error and return
                     if(isNaN(confirmed) || isNaN(negative)){
@@ -235,6 +244,7 @@ function getDataFromNHS(data){
                     
 
                     tmp.ts = utils.getTS()
+
 
                     database.update(1, tmp)
                 

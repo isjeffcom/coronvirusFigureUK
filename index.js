@@ -256,6 +256,17 @@ app.get('/all', async (req, res) => {
   
 })
 
+app.get('/board', async (req, res)=>{
+  const stream = fs.createReadStream(path.join(__dirname, 'data/board.json'))
+
+  stream.on('error', ()=>{
+    res.send('an error occur, try again')
+    return
+  })
+
+  stream.pipe(res)
+})
+
 // Approve shadow data become official data
 app.get('/approve', async (req, res) => {
 

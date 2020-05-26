@@ -384,7 +384,6 @@ async function saveErr(ready){
 
 
 
-
 module.exports = {
     current: current,
     shadow: shadow,
