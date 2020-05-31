@@ -104,6 +104,9 @@ function getData(){
 
     try {
 
+
+        console.log("get data")
+
         getDataFromNHS(figure[0])
         getDataFromWDM(figure[1])
 
@@ -510,8 +513,6 @@ function getHospitalData(data){
 
         superagent.get(data.link + (d.getDate()-1) + '-' + monthName[d.getMonth()] + '-' + d.getFullYear()).timeout(timeoutDefault).end((err, res) => {
 
-            
-            
             if(err){
                 // Wont update if link doesnt existd yet
                 //recordError(data.source, "timeout", err)
@@ -526,11 +527,12 @@ function getHospitalData(data){
                 // Search download link contains .xlsx
 
                 for(let i=0;i<att.length;i++){
+
                     let tmpLink = $(att[i]).attr('href')
-                    
 
                     if(tmpLink.indexOf('.xlsx') != -1){
                         link = tmpLink
+                        console.log(link)
                     }
                 }
 
@@ -541,8 +543,6 @@ function getHospitalData(data){
 
                         file.on('finish', ()=>{
 
-                            const { getJsDateFromExcel } = require("excel-date-to-js")
-
                             readXlsxFile('./hospital.xlsx', { sheet: 'People in Hospital (UK)' }).then(async (res)=>{
 
                                 let today = utils.tsToDate(new Date().getTime())
@@ -550,12 +550,12 @@ function getHospitalData(data){
                                 let tmpAll = { hospital: 0 }
 
                                 for(let c=0;c<res.length;c++){
+
                                     let row = res[c]
-                                    //console.log(isNaN(row[0]), isNaN(row[2]))
-                                    if(!isNaN(row[0]) && !isNaN(row[2])){
-
-                                        let thisDate = new Date(getJsDateFromExcel(row[0])).getTime()
-
+                                    
+                                    if(!isNaN(row[0]) && !isNaN(row[2]) && row[0] != null && row[2] != null){
+                                        let thisDate = new Date(ExcelDateToJSDate(row[0])).getTime()
+                                        console.log(ExcelDateToJSDate(row[0]))
                                         let num = row[2]
                                         let locName = row[1]
 
@@ -590,8 +590,6 @@ function getHospitalData(data){
 
                                 ready.hospital = tmpAll.hospital == 0 ? nowFigure : tmpAll.hospital
                                 ready.hospitalArea = addSlashes(JSON.stringify(tmpArea))
-
-                                console.log(ready)
 
                                 database.update(1, ready)
 
@@ -719,6 +717,25 @@ async function getCountries(data){
             await browser.close()
         })();
 }
+
+function ExcelDateToJSDate(serial) {
+    var utc_days  = Math.floor(serial - 25569);
+    var utc_value = utc_days * 86400;                                        
+    var date_info = new Date(utc_value * 1000);
+ 
+    var fractional_day = serial - Math.floor(serial) + 0.0000001;
+ 
+    var total_seconds = Math.floor(86400 * fractional_day);
+ 
+    var seconds = total_seconds % 60;
+ 
+    total_seconds -= seconds;
+ 
+    var hours = Math.floor(total_seconds / (60 * 60));
+    var minutes = Math.floor(total_seconds / 60) % 60;
+ 
+    return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
+ }
 
 module.exports={
     getData: getData
