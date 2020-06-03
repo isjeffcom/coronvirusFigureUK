@@ -104,9 +104,6 @@ function getData(){
 
     try {
 
-
-        console.log("get data")
-
         getDataFromNHS(figure[0])
         getDataFromWDM(figure[1])
 
@@ -122,9 +119,10 @@ function getData(){
             getTimeline(tlData)
         })
 
-        process.nextTick(()=>{
-            getHospitalData(hospitalData)
-        })
+        // Update manually
+        // process.nextTick(()=>{
+        //     getHospitalData(hospitalData)
+        // })
 
     } catch {
         console.log("major error")
@@ -243,8 +241,6 @@ async function getDataFromNHS(data){
                     tmp.death = death ? death : -1
                     tmp.tested = tested ? tested : -1
                     tmp.test_done = testedDone ? testedDone : -1
-
-                    
 
                     tmp.ts = utils.getTS()
 
@@ -555,29 +551,15 @@ function getHospitalData(data){
                                     
                                     if(!isNaN(row[0]) && !isNaN(row[2]) && row[0] != null && row[2] != null){
                                         let thisDate = new Date(ExcelDateToJSDate(row[0])).getTime()
-                                        console.log(ExcelDateToJSDate(row[0]))
-                                        let num = row[2]
-                                        let locName = row[1]
+
 
                                         // If is today
                                         if(utils.tsToDate(thisDate) == today){
-                                            tmpAll.hospital += num
-
-                                            if(locName == "Scotland" ){
-                                                tmpArea.scotland = num
-                                            }
-                            
-                                            else if(locName == "Wales"){
-                                                tmpArea.wales = num
-                                            }
-                            
-                                            else if(locName == "Northern Ireland"){
-                                                tmpArea.nIreland = num
-                                            }
-                            
-                                            else{
-                                                tmpArea.england += num
-                                            }
+                                            tmpAll.hospital = row[1]+row[2]+row[3]+row[4]+row[5]+row[6]+row[7]+row[8]+row[9]+row[10]
+                                            tmpArea.england = row[1]+row[2]+row[3]+row[4]+row[5]+row[6]+row[7]
+                                            tmpArea.scotland = row[8]
+                                            tmpArea.wales = row[9]
+                                            tmpArea.nIreland = row[10]
                                         }
                                     }
                                 }

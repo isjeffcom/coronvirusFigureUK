@@ -18,6 +18,11 @@ Root URL has changed to `https://api.covid19uk.live`, previous URL no longer acc
 5. Full History(with regional): http://api.covid19uk.live/history
 <br>
 
+### About Data
+1. People in hospital data was updated manually in every 2-4 days.
+2. Wales regional data was updated mannually in every 2-4 days.
+
+(This is due to the format or link from data source was constantly changing and manual intervention was often needed)
 
 ### API USAGE NOTICE
 There are no access barriers for this public API. Only: <br>
