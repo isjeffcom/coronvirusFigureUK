@@ -1,3 +1,15 @@
+# End of service notice
+As the COVID-19 epidemic gradually eased, the official channel improved and more personal reasons required: The COVID19UK.LIVE website will soon stop maintaining. For API users, please try to find an alternative as quickly as possible.
+
+Thank you for your support. Stay safe.
+
+The Offical Data Sources:
+
+1. UK National Dashboard / England Dashboard：https://coronavirus.data.gov.uk/?_ga=2.174461218.1658631352.1593742630-1919209646.1583791143
+2. Wales Dashboard：https://public.tableau.com/profile/public.health.wales.health.protection#!/vizhome/RapidCOVID-19virology-Public/Headlinesummary
+3. Scotland Dashboards and Statistic Reports：https://www.publichealthscotland.scot/our-areas-of-work/sharing-our-data-and-intelligence/coronavirus-covid-19-data/
+4. North Ireland Dashboard：https://app.powerbi.com/view?r=eyJrIjoiZGYxNjYzNmUtOTlmZS00ODAxLWE1YTEtMjA0NjZhMzlmN2JmIiwidCI6IjljOWEzMGRlLWQ4ZDctNGFhNC05NjAwLTRiZTc2MjVmZjZjNSIsImMiOjh9
+
 # UK Coronavirus Data Tracker API
 <img src="https://i.ibb.co/88y21MH/bbv.png" width="40%">
 A live COVID-19 data scraper API provide function with current status, history, and confirmed cases geolocation
