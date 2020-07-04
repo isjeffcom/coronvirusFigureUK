@@ -44,8 +44,8 @@ function getHospitalData(data){
 
         // data.link + d.getDate() + '-' + monthName[d.getMonth()] + '-' + d.getFullYear()
 
-        superagent.get(data.link + d.getDate() + '-' + monthName[d.getMonth()]).timeout(timeoutDefault).end((err, res) => {
-            console.log(data.link + d.getDate() + '-' + monthName[d.getMonth()])
+        superagent.get(data.link + 19 + '-' + monthName[d.getMonth()] + '-' + d.getFullYear()).timeout(timeoutDefault).end((err, res) => {
+            console.log(data.link + 19 + '-' + monthName[d.getMonth()] + '-' + d.getFullYear())
             if(err){
                 console.log("err")
                 //recordError(data.source, "timeout", err)

@@ -57,7 +57,7 @@ const figure = [
         source: "NHS",
         link: "https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public",
         more: "http://www.arcgis.com/sharing/rest/content/items/bc8ee90225644ef7a6f4dd1b13ea1d67/data",
-        id: "number-of-cases-and-deaths"
+        id: "number-of-coronavirus-deaths-and-cases"
     },
     {
         source: "Worldometers",
@@ -105,7 +105,7 @@ function getData(){
     try {
 
         getDataFromNHS(figure[0])
-        getDataFromWDM(figure[1])
+        //getDataFromWDM(figure[1])
 
         process.nextTick(()=>{
             getAreaData()
@@ -120,9 +120,9 @@ function getData(){
         })
 
         // Update manually
-        // process.nextTick(()=>{
-        //     getHospitalData(hospitalData)
-        // })
+        process.nextTick(()=>{
+            getHospitalData(hospitalData)
+        })
 
     } catch {
         console.log("major error")
@@ -172,85 +172,143 @@ async function getDataFromNHS(data){
 
             let $ = cheerio.load(res.text)
 
-            $(('h2#'+data.id)).each((idx, ele) => {
+            let death, confirmed, negative, tested, testedDone
 
-                let testReady = $(ele).next()
-                let testTxt = testReady.text()
-                testTxt = testTxt.split(" ")
-
-                let posiReady = $(ele).next().next()
-                let posiTxt = posiReady.text()
-                posiTxt = posiTxt.split(" ")
-
-                let txtDeath = $(posiReady).next().text()
-                txtDeath = txtDeath.split(" ")
-
-                // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
-                let teMIdx = utils.idIdxsInArr("tests", testTxt) // return an array with position with word 'positive'
-                let cMIdx = utils.idIdxsInArr("positive.", posiTxt) // return an array with position with word 'positive'
-                let tMIdx = utils.idIdxsInArr("tested", posiTxt) // return an array with negative with word 'negative'
-                let dMIdx = utils.idIdxsInArr("died.", txtDeath) // return an array with negative with word 'negative'
-
-                if(cMIdx != -1 
-                    && tMIdx != -1 
-                    && cMIdx.length > 0 
-                    && tMIdx.length > 0 
-                    && posiTxt.length>0){
-
-                    // Process and save to number
-                    let testedDone = parseInt(testTxt[teMIdx[0] - 1].replace(/,/g, ""))
-                    
-                    let confirmed = parseInt(posiTxt[cMIdx[0] - 4].replace(/,/g, ""))
-
-                    let tested = -1
-
-
-                    try{
-                        tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
-                    } catch{
-                        tested = current.data[0].tested
-                    }
-                    
-                    let negative = tested - confirmed
-                    let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
-                    
-                    // 2 or 3, changing all the time
-                    if(!death) death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
-                    
-                    // Debug Line
-                    // console.log(confirmed, tested, negative, death, testedDone)
-
-                    // Record if Error and return
-                    if(isNaN(confirmed) || isNaN(negative)){
-                        let errData = {
-                            death: death,
-                            confirmed: confirmed,
-                            negative: negative,
-                            tested: tested,
-                            tested_done: testedDone
-                        }
-                        recordError(data.source, "source struct changed", errData)
-                        //console.log(errData)
-                        return
-                    }
-
-                    // Final check and put into database
-                    
-                    tmp.confirmed = confirmed ? confirmed : -1
-                    tmp.negative = negative ? negative : -1
-                    tmp.death = death ? death : -1
-                    tmp.tested = tested ? tested : -1
-                    tmp.test_done = testedDone ? testedDone : -1
-
-                    tmp.ts = utils.getTS()
-
-
-                    database.update(1, tmp)
-                
-                
-                }
-    
+            // Deaths
+            $(('h3#deaths')).each((idx, ele)=>{
+                let d = $(ele).next().text()
+                let dTxt = d.split(" ")
+                let dIdx = utils.idIdxsInArr("died", dTxt)
+                death = parseInt(dTxt[dIdx[0] - 2].replace(/,/g, ""))
+                console.log(death)
             })
+            
+            // Positive Case
+            $(('h3#positive-cases')).each((idx, ele)=>{
+                console.log($(ele).next().text())
+                let c = $(ele).next().text()
+                let cTxt = c.split(" ")
+                let cIdx = utils.idIdxsInArr("positive", cTxt)
+                confirmed = parseInt(cTxt[cIdx[0] - 4].replace(/,/g, ""))
+                console.log(confirmed)
+            })
+            
+            // Tests
+            $(('h2#overall-volume-of-tests')).each((idx, ele)=>{
+                let t = $(ele).next().text()
+                let tTxt = t.split(" ")
+                let tIdx = utils.idIdxsInArr("tests", tTxt)
+                test_done = parseInt(tTxt[tIdx[0] - 1].replace(/,/g, ""))
+
+                console.log(test_done)
+            })
+
+            // Record if Error and return
+            if(isNaN(confirmed)){
+                let errData = {
+                    death: death,
+                    confirmed: confirmed,
+                    negative: negative,
+                    tested: tested,
+                    tested_done: testedDone
+                }
+                recordError(data.source, "source struct changed", errData)
+                //console.log(errData)
+                return
+            }
+
+            //Final check and put into database
+                    
+            tmp.confirmed = confirmed ? confirmed : -1
+            tmp.negative = 0
+            tmp.death = death ? death : -1
+            tmp.tested = 1881412
+            tmp.test_done = testedDone ? testedDone : -1
+
+            tmp.ts = utils.getTS()
+
+
+            database.update(1, tmp)
+
+            // $(('h2#'+data.id)).each((idx, ele) => {
+
+            //     let testReady = $(ele).next()
+            //     let testTxt = testReady.text()
+            //     testTxt = testTxt.split(" ")
+
+            //     let posiReady = $(ele).next().next()
+            //     let posiTxt = posiReady.text()
+            //     posiTxt = posiTxt.split(" ")
+
+            //     let txtDeath = $(posiReady).next().text()
+            //     txtDeath = txtDeath.split(" ")
+
+            //     // Check word 'positive' for getting positive number, both confirm and death use the word 'positive'
+            //     let teMIdx = utils.idIdxsInArr("tests", testTxt) // return an array with position with word 'positive'
+            //     let cMIdx = utils.idIdxsInArr("positive.", posiTxt) // return an array with position with word 'positive'
+            //     let tMIdx = utils.idIdxsInArr("tested", posiTxt) // return an array with negative with word 'negative'
+            //     let dMIdx = utils.idIdxsInArr("died.", txtDeath) // return an array with negative with word 'negative'
+
+            //     if(cMIdx != -1 
+            //         && tMIdx != -1 
+            //         && cMIdx.length > 0 
+            //         && tMIdx.length > 0 
+            //         && posiTxt.length>0){
+
+            //         // Process and save to number
+            //         let testedDone = parseInt(testTxt[teMIdx[0] - 1].replace(/,/g, ""))
+                    
+            //         let confirmed = parseInt(posiTxt[cMIdx[0] - 4].replace(/,/g, ""))
+
+            //         let tested = -1
+
+
+            //         try{
+            //             tested = parseInt(posiTxt[tMIdx[0] - 4].replace(/,/g, ""))
+            //         } catch{
+            //             tested = current.data[0].tested
+            //         }
+                    
+            //         let negative = tested - confirmed
+            //         let death = parseInt(txtDeath[dMIdx[0] - 2].replace(/,/g, ""))
+                    
+            //         // 2 or 3, changing all the time
+            //         if(!death) death = parseInt(txtDeath[dMIdx[0] - 3].replace(/,/g, ""))
+                    
+            //         // Debug Line
+            //         // console.log(confirmed, tested, negative, death, testedDone)
+
+            //         // Record if Error and return
+            //         if(isNaN(confirmed) || isNaN(negative)){
+            //             let errData = {
+            //                 death: death,
+            //                 confirmed: confirmed,
+            //                 negative: negative,
+            //                 tested: tested,
+            //                 tested_done: testedDone
+            //             }
+            //             recordError(data.source, "source struct changed", errData)
+            //             //console.log(errData)
+            //             return
+            //         }
+
+            //         // Final check and put into database
+                    
+            //         tmp.confirmed = confirmed ? confirmed : -1
+            //         tmp.negative = negative ? negative : -1
+            //         tmp.death = death ? death : -1
+            //         tmp.tested = tested ? tested : -1
+            //         tmp.test_done = testedDone ? testedDone : -1
+
+            //         tmp.ts = utils.getTS()
+
+
+            //         database.update(1, tmp)
+                
+                
+            //     }
+    
+            // })
 
         }
     })
@@ -383,7 +441,7 @@ function getScotlandFromNHS(data){
 
         var result = []
 
-        superagent.get(data.link).timeout(timeoutDefault).end((err, res) => {
+        superagent.get(data.link).timeout(timeoutDefault).end(async (err, res) => {
             if(err){
                 recordError(data.source, "timeout", err)
                 resolve(false)
@@ -393,12 +451,18 @@ function getScotlandFromNHS(data){
                 let tables = $('#' + data.id + ' table')
                 let trs = $(tables[0]).find('tbody tr')
                 //let trs = $('#' + data.id + ' table tbody tr')
+
+                // in case is 0 than needs to get old one from history
+                let last = await database.lastHistory()
+                //console.log(last)
+                let lastArea = JSON.parse(stripSlashes(last.data.area))
+                //console.log(lastArea)
                 
                 trs.each(function (idx, value){
                     
                     $value = $(value).find('td')
                     let tmpSingle = {}
-                    $value.each(function (idxx, single) {
+                    $value.each((idxx, single) => {
                         // Ignore first row as gov.scot dont know the first row of an HTML table should use: <th>
                         if(idx != 0){
                             if(idxx == 0){
@@ -423,6 +487,16 @@ function getScotlandFromNHS(data){
                                 // Some might completely none
                                 if(isNaN(tmpSingle.number)){
                                     tmpSingle.number = 0
+                                }
+
+                                if(tmpSingle.number == 0){
+                                    for(let i=0;i<lastArea.length;i++){
+                                        //console.log(lastArea[i])
+                                        if(lastArea[i].location == tmpSingle.location){
+                                            tmpSingle.number = lastArea[i].number
+                                        }
+                                    }
+
                                 }
                                 
                             }

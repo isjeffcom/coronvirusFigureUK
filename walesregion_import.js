@@ -26,9 +26,8 @@ readXlsxFile('./wales.xlsx', { sheet: 'Tests by specimen date' }).then(async (re
 
     for(let c=0;c<res.length;c++){
         let row = res[c]
-        console.log(row)
         let d = {location: row[0], number: row[3]}
-        p.push(save(row[1], d, c));
+        p.push(save(row[1], d, c))
     }
 
     Promise.all(p)

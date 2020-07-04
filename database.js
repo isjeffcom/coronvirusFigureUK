@@ -139,6 +139,20 @@ async function historyFigures(){
     }
 }
 
+async function lastHistory(){
+    const result = await db
+    .select("*")
+    .from("history")
+    .orderby("date desc")
+    .queryRow()
+
+    if(result){
+        return { status: true, data: result}
+    } else {
+        return { status: false, data: null, err: result }
+    }
+}
+
 // Update, default to shadow waiting for approvement
 async function update(sourceId, data){
 
@@ -389,6 +403,7 @@ module.exports = {
     shadow: shadow,
     history: history,
     historyFigures: historyFigures,
+    lastHistory: lastHistory,
     update: update,
     locations: locations,
     addLocation: addLocation,
