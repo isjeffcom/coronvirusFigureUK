@@ -180,7 +180,6 @@ async function getDataFromNHS(data){
                 let dTxt = d.split(" ")
                 let dIdx = utils.idIdxsInArr("died", dTxt)
                 death = parseInt(dTxt[dIdx[0] - 2].replace(/,/g, ""))
-                console.log(death)
             })
             
             // Positive Case
@@ -190,7 +189,6 @@ async function getDataFromNHS(data){
                 let cTxt = c.split(" ")
                 let cIdx = utils.idIdxsInArr("positive", cTxt)
                 confirmed = parseInt(cTxt[cIdx[0] - 4].replace(/,/g, ""))
-                console.log(confirmed)
             })
             
             // Tests
@@ -198,9 +196,7 @@ async function getDataFromNHS(data){
                 let t = $(ele).next().text()
                 let tTxt = t.split(" ")
                 let tIdx = utils.idIdxsInArr("tests", tTxt)
-                test_done = parseInt(tTxt[tIdx[0] - 1].replace(/,/g, ""))
-
-                console.log(test_done)
+                testedDone = parseInt(tTxt[tIdx[0] - 1].replace(/,/g, ""))
             })
 
             // Record if Error and return
