@@ -42,7 +42,7 @@ const readXlsxFile = require('read-excel-file/node')
 const fs = require('fs')
 const path = require('path')
 
-const { http, https } = require('follow-redirects');
+const { http, https } = require('follow-redirects')
 
 const struct = require('./struct.js')
 
@@ -120,9 +120,9 @@ function getData(){
         })
 
         // Update manually
-        process.nextTick(()=>{
-            getHospitalData(hospitalData)
-        })
+        // process.nextTick(()=>{
+        //     getHospitalData(hospitalData)
+        // })
 
     } catch {
         console.log("major error")
@@ -136,6 +136,8 @@ async function getAreaData(){
     const nIreland = await getNIreland(areaData[2])
     const wales = await getWales(areaData[3])
 
+    
+
     if(england && scotland && nIreland && wales){
         
         let res = england.concat(scotland)
@@ -143,6 +145,10 @@ async function getAreaData(){
         
         // Northern Ireland is as one due to there is no regional data available
         res.push(nIreland)
+
+        res.forEach(el => {
+            console.log(el.number)
+        });
         
         let ready = {
             area: addSlashes(JSON.stringify(res))
@@ -151,6 +157,8 @@ async function getAreaData(){
         if(ready.area != "" || ready.area.length > 0){
             database.update(1, ready)
         }
+    } else {
+        console.log("eee")
     }
 }
 
@@ -366,7 +374,6 @@ function getDataFromWDM(data){
 async function getEnglandFromNHS(data){
     return new Promise(async resolve => {
 
-
         (async () => {
             let result = []
             const browser = await puppeteer.launch({ args: ['--no-sandbox']});
@@ -381,6 +388,8 @@ async function getEnglandFromNHS(data){
 
             //console.log(trs.text())
             trs.each(function (idx, value){
+
+                
             
                 $value = $(value).find('td')
                 let tmpSingle = {}
